@@ -1,40 +1,22 @@
-require('dotenv').config();
 const express = require('express');
-const mongoose = require('mongoose');
-const path = require('path');
 const bodyParser = require('body-parser');
+const axios = require('axios');
+const path = require('path');
+const mongoose = require('mongoose');
+const Complaint = require('./models/Complaint');
 const session = require('express-session');
 const passport = require('passport');
-const MongoStore = require('connect-mongo');
 const crypto = require('crypto');
-const axios = require('axios');
-
-const Complaint = require('./models/Complaint');
 const Contact = require('./models/Contact');
-require('./auth'); // <- load passport config
+require('./auth'); // import the passport config
+
 
 const app = express();
 
-// MongoDB connection
-const mongoURI = 'mongodb+srv://pushpendrakumar:Realme%4012345@straydogsdata.d06bomp.mongodb.net/complaints';
-
-mongoose.connect(mongoURI, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true
-})
-.then(() => console.log('✅ Connected to MongoDB'))
-.catch(err => console.error('❌ Connection error:', err));
-
-// Sessions
 app.use(session({
-  secret: process.env.SESSION_SECRET || 's0m3V3ryRand0mS3cretStr1ng!',
+  secret: crypto.randomBytes(64).toString('hex'),
   resave: false,
-  saveUninitialized: false,
-  store: MongoStore.create({ mongoUrl: mongoURI, collectionName: 'sessions' }),
-  cookie: {
-    secure: true,
-    sameSite: 'none'
-  }
+  saveUninitialized: false
 }));
 
 app.use(passport.initialize());
@@ -46,36 +28,57 @@ app.use(express.static('public'));
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 
+mongoose.connect('mongodb+srv://pushpendrakumar:Realme%4012345@straydogsdata.d06bomp.mongodb.net/complaints', {
+  useNewUrlParser: true,
+  useUnifiedTopology: true
+})
+.then(() => console.log('✅ Connected to MongoDB'))
+.catch(err => console.error('❌ Connection error:', err));
+
+app.get('/auth/google',
+  passport.authenticate('google', { scope: ['profile', 'email'] })
+);
+
 app.use((req, res, next) => {
   res.locals.user = req.user;
   next();
 });
 
-// Routes
-app.get('/auth/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
 
 app.get('/auth/google/callback',
   passport.authenticate('google', { failureRedirect: '/fail' }),
-  (req, res) => res.redirect('/dashboard')
+  function(req, res) {
+    res.redirect('/dashboard');
+  }
 );
-
-app.get('/fail', (req, res) => {
-  res.render('test');
-});
+app.get('fail', (req,res)=>{
+  res.render('test')
+})
 
 app.get('/dashboard', (req, res) => {
   if (!req.isAuthenticated()) return res.render('test');
-  res.render('index');
+    res.render('index');
 });
 
 app.get('/logout', (req, res) => {
-  req.logout(() => res.redirect('/'));
+  req.logout(() => {
+    res.redirect('/');
+  });
 });
 
-// Public pages
-app.get('/', (req, res) => res.render('index'));
-app.get('/raise-your-voice', (req, res) => res.render('raise-your-voice'));
-app.get('/contact-us', (req, res) => res.render('contact-us'));
+// Home route
+app.get('/', (req, res) => {
+  res.render('index');
+});
+
+// Home route
+app.get('/raise-your-voice', (req, res) => {
+  res.render('raise-your-voice');
+});
+
+app.get('/contact-us', (req, res) => {
+  res.render('contact-us');
+});
 
 app.get('/complaints', async (req, res) => {
   try {
@@ -87,40 +90,53 @@ app.get('/complaints', async (req, res) => {
   }
 });
 
-// Complaint form
+// Form submission route
 app.post('/submit', async (req, res) => {
   const { message, doi, city, state, 'g-recaptcha-response': token } = req.body;
 
+  // ✅ Reject if not logged in
   if (!req.isAuthenticated()) {
     return res.render('nologin', { message: "⚠️ You must be logged in via Google to submit a complaint." });
   }
 
-  const { name, email } = req.user;
+const name = req.user.name;
+const email = req.user.email;
 
-  if (!token) return res.send('⚠️ reCAPTCHA token missing.');
+  if (!token) {
+    return res.send('⚠️ reCAPTCHA token missing.');
+  }
 
   try {
-    const response = await axios.post('https://www.google.com/recaptcha/api/siteverify', null, {
-      params: {
-        secret: '6LdCpz4rAAAAAD34Q_Dy2DbI7elrwnIcCfXWN6XU',
-        response: token
+    const secretKey = '6LdCpz4rAAAAAD34Q_Dy2DbI7elrwnIcCfXWN6XU';
+
+    const response = await axios.post(
+      `https://www.google.com/recaptcha/api/siteverify`,
+      null,
+      {
+        params: {
+          secret: secretKey,
+          response: token,
+        },
       }
-    });
+    );
 
     const data = response.data;
+
     if (!data.success || data.score < 0.5 || data.action !== 'submit') {
-      return res.send('⚠️ Captcha failed.');
+      return res.send('⚠️ Captcha failed. Please try again or check for suspicious activity.');
     }
 
+    // ✅ Save complaint with authenticated user's name
     await Complaint.create({ name, email, message, doi, city, state });
-    res.redirect('/');
+    return res.redirect('/');
+
   } catch (err) {
     console.error('Captcha error:', err);
     res.status(500).send('❌ Server error during captcha verification.');
   }
 });
-
-// Contact form
+//contact-us form
+// Form submission route
 app.post('/contact-us', async (req, res) => {
   const { city, state, age, joinus, 'g-recaptcha-response': token } = req.body;
 
@@ -128,39 +144,55 @@ app.post('/contact-us', async (req, res) => {
     return res.render('nologin', { message: "⚠️ You must be logged in via Google to submit this form." });
   }
 
-  const { name, email } = req.user;
+  const name = req.user.name;
+  const email = req.user.email;
 
-  if (!token) return res.send('⚠️ reCAPTCHA token missing.');
+  if (!token) {
+    return res.send('⚠️ reCAPTCHA token missing.');
+  }
 
   try {
-    const response = await axios.post('https://www.google.com/recaptcha/api/siteverify', null, {
-      params: {
-        secret: '6LdCpz4rAAAAAD34Q_Dy2DbI7elrwnIcCfXWN6XU',
-        response: token
+    const secretKey = '6LdCpz4rAAAAAD34Q_Dy2DbI7elrwnIcCfXWN6XU';
+
+    const response = await axios.post(
+      `https://www.google.com/recaptcha/api/siteverify`,
+      null,
+      {
+        params: {
+          secret: secretKey,
+          response: token,
+        },
       }
-    });
+    );
 
     const data = response.data;
+
     if (!data.success || data.score < 0.5 || data.action !== 'submit') {
-      return res.send('⚠️ Captcha failed.');
+      return res.send('⚠️ Captcha failed. Please try again or check for suspicious activity.');
     }
+
+    const ageNum = parseInt(age, 10);
+    const joinusBool = joinus === 'on';
 
     await Contact.create({
       name,
       email,
       city,
       state,
-      age: parseInt(age, 10),
-      joinus: joinus === 'on'
+      age: ageNum,
+      joinus: joinusBool,
     });
 
-    res.render('joined');
+    return res.render('joined');
+
   } catch (err) {
     console.error('Captcha error:', err);
     res.status(500).send('❌ Server error during captcha verification.');
   }
 });
 
-// Server start
+
+
+// Start server
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`Server running on http://localhost:${PORT}`));
+app.listen(PORT, () => console.log(`Server running at http://localhost:${PORT}`));
