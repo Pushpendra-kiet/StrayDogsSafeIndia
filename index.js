@@ -7,19 +7,12 @@ const Complaint = require('./models/Complaint');
 const session = require('express-session');
 const passport = require('passport');
 const crypto = require('crypto');
-const cookieParser = require('cookie-parser');
 const Contact = require('./models/Contact');
 require('./auth'); // import the passport config
 
 
 const app = express();
 
-app.use(cookieParser());
-
-app.set('trust proxy', 1); // if behind a proxy like Heroku
-
-// Use a persistent session store in production (e.g., connect-mongo)
-// For development, default MemoryStore is fine but not recommended for production
 app.use(session({
   secret: crypto.randomBytes(64).toString('hex'),
   resave: false,
