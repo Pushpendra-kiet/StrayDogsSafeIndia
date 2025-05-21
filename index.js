@@ -46,11 +46,14 @@ app.use((req, res, next) => {
 
 
 app.get('/auth/google/callback',
-  passport.authenticate('google', { failureRedirect: '/' }),
+  passport.authenticate('google', { failureRedirect: '/fail' }),
   function(req, res) {
     res.redirect('/dashboard');
   }
 );
+app.get('fail', (req,res)=>{
+  res.render('test')
+})
 
 app.get('/dashboard', (req, res) => {
   if (!req.isAuthenticated()) return res.render('test');
