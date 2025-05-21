@@ -213,4 +213,5 @@ app.post('/contact-us', async (req, res) => {
 
 // Start server
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`Server running at http://localhost:${PORT}`));
+//app.listen(PORT, () => console.log(`Server running at http://localhost:${PORT}`));
+module.exports = app;
