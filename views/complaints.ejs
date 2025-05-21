@@ -1,0 +1,23 @@
+<%- include('partials/header') %>
+  <div class="container mt-5">
+    <h1 class="mb-4">Recent Complaints</h1>
+
+    <% if (complaints.length === 0) { %>
+      <p>No complaints have been submitted yet.</p>
+    <% } else { %>
+      <% complaints.forEach(complaint => { %>
+        <div class="card mb-3 shadow-sm">
+          <div class="card-body">
+            <h5 class="card-title"><span class="badge text-bg-info"><%= complaint.name %></span></h5>
+            <p class="card-text"><%= complaint.message %></p>
+            <p class="text-muted" style="text-align: right;"><small><strong>Date of Incident:</strong> <%= complaint.doi.toLocaleString() %></small></p>
+            <p class="text-muted" style="text-align: right;"><small>City<%= complaint.city %>, State <%= complaint.state %></small></p>
+            <p class="text-muted"><small><strong>Reported on:<%= complaint.createdAt.toLocaleString() %></strong></small></p>
+          </div>
+        </div>
+      <% }); %>
+    <% } %>
+
+    <a href="/" class="btn btn-primary mt-3">Back to Home</a>
+  </div>
+<%- include('partials/footer') %>
