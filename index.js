@@ -13,6 +13,8 @@ require('./auth'); // import the passport config
 
 const app = express();
 
+
+
 app.use(session({
   secret: crypto.randomBytes(64).toString('hex'),
   resave: false,

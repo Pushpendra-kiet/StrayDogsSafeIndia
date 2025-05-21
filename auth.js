@@ -6,7 +6,7 @@ const USER = {}; // You can later save users in MongoDB
 passport.use(new GoogleStrategy({
   clientID: '1067075470360-ujqa07afqodhi7sdbnv5he6303vjr4g2.apps.googleusercontent.com',
   clientSecret: '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',
-  callbackURL: 'https://stray-dogs-safe-india.vercel.app/auth/google/callback',
+  callbackURL: 'auth/google/callback',
 },
 function(accessToken, refreshToken, profile, done) {
   // Simulate storing user in DB
