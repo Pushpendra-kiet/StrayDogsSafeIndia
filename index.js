@@ -13,11 +13,37 @@ require('./auth'); // import the passport config
 
 const app = express();
 
-app.use(session({
-  secret: crypto.randomBytes(64).toString('hex'),
-  resave: false,
-  saveUninitialized: false
+const MongoStore = require('connect-mongo');
+passport.use(new (require('passport-google-oauth20').Strategy)({
+  clientID: '1067075470360-ujqa07afqodhi7sdbnv5he6303vjr4g2.apps.googleusercontent.com',
+  clientSecret: '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',
+  callbackURL: 'https://stray-dogs-safe-india.vercel.app/auth/google/callback'
+}, async (accessToken, refreshToken, profile, done) => {
+  // You can customize user handling here
+  const user = {
+    id: profile.id,
+    name: profile.displayName,
+    email: profile.emails && profile.emails[0] ? profile.emails[0].value : ''
+  };
+  done(null, user);
 }));
+
+passport.serializeUser((user, done) => {
+  done(null, user);
+});
+passport.deserializeUser((user, done) => {
+  done(null, user);
+});
+app.use(session({
+  secret: process.env.SESSION_SECRET || 'straydogs-session-secret',
+  resave: false,
+  saveUninitialized: false,
+  store: MongoStore.create({
+    mongoUrl: 'mongodb+srv://pushpendrakumar:Realme%4012345@straydogsdata.d06bomp.mongodb.net/complaints',
+    collectionName: 'sessions'
+  })
+}));
+
 
 app.use(passport.initialize());
 app.use(passport.session());
