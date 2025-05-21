@@ -28,7 +28,7 @@ app.use(express.static('public'));
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 
-mongoose.connect('mongodb://localhost:27017/StrayComplaints', {
+mongoose.connect('mongodb+srv://pushpendrakumar:Realme%4012345@straydogsdata.d06bomp.mongodb.net/complaints', {
   useNewUrlParser: true,
   useUnifiedTopology: true
 })
