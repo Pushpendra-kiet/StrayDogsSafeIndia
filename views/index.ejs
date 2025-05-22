@@ -15,6 +15,46 @@
  <script src="https://www.google.com/recaptcha/api.js"></script>
 </head>
 <body>
+    <style>
+        .test:hover {
+  color: magenta;background-color: aquamarine;
+}
+     .testnew:hover {
+  color: magenta;background-color: aquamarine;
+}
+    </style>
+<ul class="nav justify-content-end" style="background-color: bisque">
+  <li class="nav-item">
+    <a class="nav-link active test" aria-current="page" href="https://saftefy-from-stray-dogs.vercel.app/">Home</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link test" href="https://saftefy-from-stray-dogs.vercel.app/raise-your-voice">Raise Your Voice</a>
+  </li>
+    <li class="nav-item">
+    <a class="nav-link test" href="https://saftefy-from-stray-dogs.vercel.app/complaints">Complaints</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link test" href="https://saftefy-from-stray-dogs.vercel.app/contact-us">Contact Us</a>
+  </li>
+  <li class="nav-item">
+    <% if (!user) { %>
+      <a class="nav-link test" href="https://saftefy-from-stray-dogs.vercel.app/auth/google">Login</a>
+    <% } else { %>
+      <a class="nav-link test" href="https://saftefy-from-stray-dogs.vercel.app/logout">Logout</a>
+    <% } %>
+  </li>
+</ul>
+<!-- Header -->
+ <style>
+    body{
+        background-color: antiquewhite;
+    }
+ </style>
+<header class="bg-dark text-white p-4 text-center">
+  <h1>StrayDogsSafeIndia</h1>
+  <p class="fs-5">"आवारा कुत्तों से सुरक्षा के लिए एक मानवीय समाधान"</p>
+</header>
+
   <!-- Hero Section -->
         <div class="container py-5">
         <div class="row align-items-center">
