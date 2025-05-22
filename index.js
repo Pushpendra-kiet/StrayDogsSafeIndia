@@ -196,8 +196,8 @@ app.post('/submit', async (req, res) => {
   const { message, doi, city, state, 'g-recaptcha-response': token } = req.body;
 
   if (typeof user !== 'undefined' && user) {
-  const name = user.name;
-  const email = user.email;  
+  var myname = user.name;
+  var myemail = user.email;  
   } else { 
    return res.render('/test')
   }
@@ -227,7 +227,7 @@ app.post('/submit', async (req, res) => {
     }
 
     // ✅ Save complaint with authenticated user's name
-    await Complaint.create({ name, email, message, doi, city, state });
+    await Complaint.create({ myname, myemail, message, doi, city, state });
     return res.redirect('/');
 
   } catch (err) {
