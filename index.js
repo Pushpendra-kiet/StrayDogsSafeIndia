@@ -207,7 +207,7 @@ app.post('/submit', async (req, res) => {
   }
 
   try {
-    const secretKey = '6LfIa0QrAAAAAIc9ClrzUwuNBPkETjBYxqsNMZqV';
+    const secretKey = '6LdCpz4rAAAAAD34Q_Dy2DbI7elrwnIcCfXWN6XU';
 
     const response = await axios.post(
       `https://www.google.com/recaptcha/api/siteverify`,
