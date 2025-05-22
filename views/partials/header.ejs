@@ -25,8 +25,8 @@
   color: magenta;background-color: aquamarine;
 }
 .profile-picture {
-      width: 100px;
-      height: 100px;
+      width: 60px;
+      height: 60px;
       border-radius: 50%;
       object-fit: cover;
     }
@@ -45,6 +45,15 @@
     <a class="nav-link test" href="https://saftefy-from-stray-dogs.vercel.app/contact-us">Contact Us</a>
   </li>
   <li class="nav-item">
+ <% if (typeof user !== 'undefined' && user) { %>
+  <h5>Welcome, <%= user.name %></h4>
+  <p>Email: <%= user.email %></p>
+  <img src="<%= user.picture %>" alt="Profile Picture" class="profile-picture" />
+  <br />
+  <a href="/auth/logout">Logout</a>
+<% } else { %>
+  <a href="/auth/google"><button>Login</button></a>
+<% } %>
 
 
   </li>
