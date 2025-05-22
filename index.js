@@ -98,6 +98,23 @@ app.get('/auth/logout', (req, res) => {
   });
 });
 
+app.use((req, res, next) => {
+  let user = null;
+
+  if (req.session && req.session.user) {
+    user = req.session.user;
+  } else if (req.cookies && req.cookies.user) {
+    try {
+      user = JSON.parse(req.cookies.user);
+    } catch (err) {
+      console.error('Invalid user cookie:', err);
+    }
+  }
+
+  res.locals.user = user; // Make user available in all EJS templates
+  next();
+});
+
 
 // Home Route
 app.get('/', (req, res) => {
