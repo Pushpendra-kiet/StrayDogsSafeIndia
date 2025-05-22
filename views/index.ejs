@@ -1,6 +1,6 @@
 <%- include('partials/header') %>
   <!-- Hero Section -->
-       <% if (typeof user !== 'undefined') { %>
+ <% if (typeof user !== 'undefined' && user) { %>
   <h4>Welcome, <%= user.name %></h4>
   <p>Email: <%= user.email %></p>
   <img src="<%= user.picture %>" alt="Profile Picture" class="profile-picture" />
@@ -9,6 +9,7 @@
 <% } else { %>
   <a href="/auth/google"><button>Login</button></a>
 <% } %>
+
 
         <div class="container py-5">
         <div class="row align-items-center">
