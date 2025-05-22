@@ -95,10 +95,13 @@ app.get('/auth/logout', (req, res) => {
 });
 
 
-// Home route
+// Home Route
 app.get('/', (req, res) => {
-  console.log('output', req.session.user)
-  res.render('index', { user: req.session.user });
+  if (req.session.user) {
+    res.render('index', { user: req.session.user });
+  } else {
+    res.render('index');
+  }
 });
 
 // Home route
