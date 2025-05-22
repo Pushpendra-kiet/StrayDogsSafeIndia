@@ -42,7 +42,8 @@ app.set('views', path.join(__dirname, 'views'));
 
 mongoose.connect('mongodb+srv://pushpendrakumar:Realme%4012345@straydogsdata.d06bomp.mongodb.net/complaints', {
   useNewUrlParser: true,
-  useUnifiedTopology: true
+  useUnifiedTopology: true,
+  bufferTimeoutMS: 30000
 })
 .then(() => console.log('✅ Connected to MongoDB'))
 .catch(err => console.error('❌ Connection error:', err));
@@ -172,7 +173,7 @@ app.get('/complaints', async (req, res) => {
   }
 
   try {
-    const complaints = await Complaint.find().sort({ createdAt: -1 }).limit(100);
+    const complaints = await Complaint.find().sort({ createdAt: -1 }).limit(10);
     res.render('complaints', { complaints, user });
   } catch (err) {
     console.error(err);
