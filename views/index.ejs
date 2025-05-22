@@ -75,23 +75,35 @@
           <output id="ratingOutput" style="font-weight: 700;">5</output>/10
         </div>
 
-        <!-- Question 2: Checkboxes -->
         <div class="mb-4">
-          <label class="form-label">2. कृपया निम्न बातों से सहमति व्यक्त करें:</label>
-          <div class="form-check mt-2">
-            <input class="form-check-input" type="checkbox" id="q1">
-            <label class="form-check-label" for="q1">
-              क्या आप मानते हैं कि आवारा कुत्तों की समस्या के लिए मानवीय समाधान की आवश्यकता है?
-            </label>
-          </div>
-          <div class="form-check mt-2">
-            <input class="form-check-input" type="checkbox" id="q2">
-            <label class="form-check-label" for="q2">
-              क्या आप अपने क्षेत्र और सड़कों पर भूखे कुत्तों के आतंक से देश को मुक्त कराने के लिए इस आंदोलन में शामिल होना चाहते हैं?
-            </label>
-          </div>
-        </div>
+  <label class="form-label">2. कृपया निम्न बातों पर अपना मत दें:</label>
+  
+  <!-- Question 2.1 -->
+  <div class="mb-3">
+    <p><strong>क्या आप मानते हैं कि आवारा कुत्तों की समस्या के लिए मानवीय समाधान की आवश्यकता है?</strong></p>
+    <div class="form-check form-check-inline">
+      <input class="form-check-input" type="radio" name="q1" id="q1Yes" value="yes" required>
+      <label class="form-check-label" for="q1Yes">हाँ</label>
+    </div>
+    <div class="form-check form-check-inline">
+      <input class="form-check-input" type="radio" name="q1" id="q1No" value="no" required>
+      <label class="form-check-label" for="q1No">नहीं</label>
+    </div>
+  </div>
 
+  <!-- Question 2.2 -->
+  <div>
+    <p><strong>क्या आप अपने क्षेत्र और सड़कों पर भूखे कुत्तों के आतंक से देश को मुक्त कराने के लिए इस आंदोलन में शामिल होना चाहते हैं?</strong></p>
+    <div class="form-check form-check-inline">
+      <input class="form-check-input" type="radio" name="q2" id="q2Yes" value="yes" required>
+      <label class="form-check-label" for="q2Yes">हाँ</label>
+    </div>
+    <div class="form-check form-check-inline">
+      <input class="form-check-input" type="radio" name="q2" id="q2No" value="no" required>
+      <label class="form-check-label" for="q2No">नहीं</label>
+    </div>
+  </div>
+</div>
         <button type="submit" class="btn btn-primary w-100">अपना जवाब सबमिट करें</button>
       </form>
     </div>
@@ -101,13 +113,14 @@ document.getElementById('pollForm').addEventListener('submit', function (e) {
 
   // Collect form data
   const rating = document.getElementById('ratingRange').value;
-  const agree1 = document.getElementById('q1').checked;
-  const agree2 = document.getElementById('q2').checked;
+ const q1Answer = document.querySelector('input[name="q1"]:checked').value;
+const q2Answer = document.querySelector('input[name="q2"]:checked').value;
+
 
   const data = {
     rating: parseInt(rating),
-    agree1,
-    agree2
+   q1Answer,
+    q2Answer
   };
 
   // Send AJAX POST request
