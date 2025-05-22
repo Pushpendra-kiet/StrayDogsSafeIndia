@@ -18,6 +18,50 @@
         </div>
     </div>
    <hr>
+
+   <div class="container my-5">
+  <div class="row align-items-center">
+    <!-- Left: Poll Form -->
+    <div class="col-md-6">
+      <h4 class="mb-4">अपने विचार साझा करें</h4>
+      <form>
+        <!-- Question 1: Rating -->
+        <div class="mb-3">
+          <label class="form-label">1. इस मुद्दे की गंभीरता को 1 से 10 तक रेट करें:</label>
+          <input type="range" class="form-range" min="1" max="10" step="1" id="ratingRange" oninput="ratingOutput.value = ratingRange.value">
+          <output id="ratingOutput">5</output>/10
+        </div>
+
+        <!-- Question 2: Checkboxes -->
+        <div class="mb-3">
+          <label class="form-label">2. कृपया निम्न बातों से सहमति व्यक्त करें:</label>
+          <div class="form-check">
+            <input class="form-check-input" type="checkbox" id="q1">
+            <label class="form-check-label" for="q1">
+              क्या आप मानते हैं कि आवारा कुत्तों की समस्या के लिए मानवीय समाधान की आवश्यकता है?
+            </label>
+          </div>
+          <div class="form-check mt-2">
+            <input class="form-check-input" type="checkbox" id="q2">
+            <label class="form-check-label" for="q2">
+              क्या आप अपने क्षेत्र और सड़कों पर भूखे कुत्तों के आतंक से देश को मुक्त कराने के लिए इस आंदोलन में शामिल होना चाहते हैं?
+            </label>
+          </div>
+        </div>
+
+        <!-- Submit Button -->
+        <button type="submit" class="btn btn-primary mt-3">अपना जवाब सबमिट करें</button>
+      </form>
+    </div>
+
+    <!-- Right: Image -->
+    <div class="col-md-6 text-center">
+      <img src="/images/stray-dogs-awareness.jpg" alt="Awareness Image" class="img-fluid rounded shadow" style="max-height: 400px;">
+    </div>
+  </div>
+</div>
+
+
     <div class="container my-5">
         <div class="row align-items-center" >
             <div class="col-md-6">
