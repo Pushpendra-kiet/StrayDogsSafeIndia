@@ -299,7 +299,7 @@ app.post('/contact-us', async (req, res) => {
       joinus: joinusBool,
     });
 
-    return res.render('joined');
+    return res.render('joined',{user} );
 
   } catch (err) {
     console.error('Captcha error:', err);
