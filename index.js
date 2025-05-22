@@ -156,9 +156,22 @@ app.get('/contact-us', (req, res) => {
 });
 
 app.get('/complaints', async (req, res) => {
+
+      let user = null;
+
+  if (req.session && req.session.user) {
+    user = req.session.user;
+  } else if (req.cookies && req.cookies.user) {
+    try {
+      user = JSON.parse(req.cookies.user);
+    } catch (err) {
+      console.error('Invalid cookie:', err);
+    }
+  }
+
   try {
     const complaints = await Complaint.find().sort({ createdAt: -1 }).limit(100);
-    res.render('complaints', { complaints });
+    res.render('complaints', { complaints, user });
   } catch (err) {
     console.error(err);
     res.status(500).send('❌ Error fetching complaints');
@@ -167,15 +180,29 @@ app.get('/complaints', async (req, res) => {
 
 // Form submission route
 app.post('/submit', async (req, res) => {
-  const { message, doi, city, state, 'g-recaptcha-response': token } = req.body;
 
-  // ✅ Reject if not logged in
-  if (!req.isAuthenticated()) {
-    return res.render('nologin', { message: "⚠️ You must be logged in via Google to submit a complaint." });
+        let user = null;
+
+  if (req.session && req.session.user) {
+    user = req.session.user;
+  } else if (req.cookies && req.cookies.user) {
+    try {
+      user = JSON.parse(req.cookies.user);
+    } catch (err) {
+      console.error('Invalid cookie:', err);
+    }
   }
 
-const name = req.user.name;
-const email = req.user.email;
+  const { message, doi, city, state, 'g-recaptcha-response': token } = req.body;
+
+  if (typeof user !== 'undefined' && user) {
+  const name = user.name;
+  const email = user.email;  
+  } else { 
+   return res.render('/test')
+  }
+
+
 
   if (!token) {
     return res.send('⚠️ reCAPTCHA token missing.');
