@@ -13,26 +13,14 @@ require('./auth'); // import the passport config
 //CHANGES DONE
 const app = express();
 
-
+app.use(session({
+  secret: process.env.AUTH_SESSION_SECRET,
+  resave: false,
+  saveUninitialized: false
+}));
 
 app.use(passport.initialize());
 app.use(passport.session());
-
-// Initialize Google OAuth Client
-const client = new OAuth2Client(
-  process.env.AUTH_CLIENT_ID,
-  process.env.AUTH_CLIENT_SECRET,
-  process.env.GOOGLE_REDIRECT_URI
-);
- 
-// Middleware for handling sessions
-app.use(
-  session({
-    secret: process.env.AUTH_CLIENT_SECRET,
-    resave: false,
-    saveUninitialized: true,
-  })
-);
 
 // Middleware
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -47,13 +35,9 @@ mongoose.connect('mongodb+srv://pushpendrakumar:Realme%4012345@straydogsdata.d06
 .then(() => console.log('✅ Connected to MongoDB'))
 .catch(err => console.error('❌ Connection error:', err));
 
-app.get('/auth/google', (req, res) => {
-  const url = client.generateAuthUrl({
-    access_type: 'offline',
-    scope: ['profile', 'email'],
-  });
-  res.redirect(url);
-});
+app.get('/auth/google',
+  passport.authenticate('google', { scope: ['profile', 'email'] })
+);
 
 app.use((req, res, next) => {
   res.locals.user = req.user;
@@ -61,40 +45,12 @@ app.use((req, res, next) => {
 });
 
 
-app.get('/auth/google/callback', async (req, res) => {
-  const code = req.query.code;
- 
-  if (!code) {
-    return res.status(400).send('Invalid request. No authorization code provided.');
+app.get('/auth/google/callback',
+  passport.authenticate('google', { failureRedirect: '/fail' }),
+  function(req, res) {
+    res.redirect('/dashboard');
   }
- 
-  try {
-    // Exchange authorization code for access token
-    const { tokens } = await client.getToken(code);
- 
-    // Verify the token and get user information
-    const ticket = await client.verifyIdToken({
-      idToken: tokens.id_token,
-      audience: process.env.AUTH_CLIENT_ID,
-    });
- 
-    const payload = ticket.getPayload();
- 
-    // Save user info in session
-    req.session.user = {
-      name: payload.name,
-      email: payload.email,
-      picture: payload.picture,
-    };
- 
-    res.redirect('/');
-  } catch (error) {
-    console.error('Error during Google OAuth callback:', error);
-    res.status(500).send('Authentication failed.');
-  }
-});
-
-
+);
 app.get('fail', (req,res)=>{
   res.render('test')
 })
@@ -104,11 +60,8 @@ app.get('/dashboard', (req, res) => {
     res.render('index');
 });
 
-app.get('/auth/logout', (req, res) => {
-  req.session.destroy((err) => {
-    if (err) {
-      return res.status(500).send('Failed to logout.');
-    }
+app.get('/logout', (req, res) => {
+  req.logout(() => {
     res.redirect('/');
   });
 });
