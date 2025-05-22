@@ -10,7 +10,7 @@ const crypto = require('crypto');
 const Contact = require('./models/Contact');
 require('./auth'); // import the passport config
 
-
+//CHANGES DONE
 const app = express();
 
 app.use(session({
