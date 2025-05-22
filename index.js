@@ -1,11 +1,12 @@
 const express = require('express');
 const bodyParser = require('body-parser');
+const { OAuth2Client } = require('google-auth-library');
+require('dotenv').config();
 const axios = require('axios');
 const path = require('path');
 const mongoose = require('mongoose');
 const Complaint = require('./models/Complaint');
 const session = require('express-session');
-const passport = require('passport');
 const crypto = require('crypto');
 const Contact = require('./models/Contact');
 require('./auth'); // import the passport config
@@ -13,14 +14,20 @@ require('./auth'); // import the passport config
 //CHANGES DONE
 const app = express();
 
-app.use(session({
-  secret: process.env.AUTH_SESSION_SECRET,
-  resave: false,
-  saveUninitialized: false
-}));
+const client = new OAuth2Client(
+  process.env.AUTH_CLIENT_ID,
+  process.env.AUTH_CLIENT_SECRET,
+  process.env.GOOGLE_REDIRECT_URI
+);
 
-app.use(passport.initialize());
-app.use(passport.session());
+//Middleware for handling sessions
+app.use(
+  session({
+    secret: process.env.AUTH_SESSION_SECRET,
+    resave: false,
+    saveUninitialized: true,
+  })
+);
 
 // Middleware
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -35,36 +42,58 @@ mongoose.connect('mongodb+srv://pushpendrakumar:Realme%4012345@straydogsdata.d06
 .then(() => console.log('✅ Connected to MongoDB'))
 .catch(err => console.error('❌ Connection error:', err));
 
-app.get('/auth/google',
-  passport.authenticate('google', { scope: ['profile', 'email'] })
-);
-
-app.use((req, res, next) => {
-  res.locals.user = req.user;
-  next();
+app.get('/auth/google', (req, res) => {
+  const url = client.generateAuthUrl({
+    access_type: 'offline',
+    scope: ['profile', 'email'],
+  });
+  res.redirect(url);
 });
 
+// Google OAuth Callback Route
+app.get('/auth/google/callback', async (req, res) => {
+  const code = req.query.code;
 
-app.get('/auth/google/callback',
-  passport.authenticate('google', { failureRedirect: '/fail' }),
-  function(req, res) {
-    res.redirect('/dashboard');
+  if (!code) {
+    return res.status(400).send('Invalid request. No authorization code provided.');
   }
-);
-app.get('fail', (req,res)=>{
-  res.render('test')
-})
 
-app.get('/dashboard', (req, res) => {
-  if (!req.isAuthenticated()) return res.render('test');
-    res.render('index');
+  try {
+    // Exchange authorization code for access token
+    const { tokens } = await client.getToken(code);
+
+    // Verify the token and get user information
+    const ticket = await client.verifyIdToken({
+      idToken: tokens.id_token,
+      audience: process.env.AUTH_CLIENT_ID,
+    });
+
+    const payload = ticket.getPayload();
+
+    // Save user info in session
+    req.session.user = {
+      name: payload.name,
+      email: payload.email,
+      picture: payload.picture,
+    };
+
+    res.redirect('/');
+  } catch (error) {
+    console.error('Error during Google OAuth callback:', error);
+    res.status(500).send('Authentication failed.');
+  }
 });
 
-app.get('/logout', (req, res) => {
-  req.logout(() => {
+// Logout Route
+app.get('/auth/logout', (req, res) => {
+  req.session.destroy((err) => {
+    if (err) {
+      return res.status(500).send('Failed to logout.');
+    }
     res.redirect('/');
   });
 });
+
 
 // Home route
 app.get('/', (req, res) => {
@@ -73,11 +102,11 @@ app.get('/', (req, res) => {
 
 // Home route
 app.get('/raise-your-voice', (req, res) => {
-  res.render('raise-your-voice');
+  res.render('raise-your-voice',{ user: req.session.user });
 });
 
 app.get('/contact-us', (req, res) => {
-  res.render('contact-us');
+  res.render('contact-us',{ user: req.session.user });
 });
 
 app.get('/complaints', async (req, res) => {
