@@ -39,8 +39,14 @@
     <a class="nav-link test" href="https://saftefy-from-stray-dogs.vercel.app/contact-us">Contact Us</a>
   </li>
   <li class="nav-item">
-    <p><% =user %></p>  
-   <a href="/auth/google">Login with Google</a>
+      <% if (typeof user !== 'undefined') { %>
+    <p>Hello, <%= user.name %>!</p>
+    <form action="/auth/logout" method="GET">
+      <button type="submit">Logout</button>
+    </form>
+  <% } else { %>
+    <a href="/auth/google"><button>Login</button></a>
+  <% } %>
   </li>
 </ul>
 <!-- Header -->
