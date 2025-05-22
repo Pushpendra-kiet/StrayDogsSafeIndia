@@ -97,7 +97,8 @@ app.get('/auth/logout', (req, res) => {
 
 // Home route
 app.get('/', (req, res) => {
-  res.render('index');
+  console.log('output', req.session.user)
+  res.render('index', { user: req.session.user });
 });
 
 // Home route
