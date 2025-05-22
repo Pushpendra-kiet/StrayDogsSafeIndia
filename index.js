@@ -9,10 +9,13 @@ const Complaint = require('./models/Complaint');
 const session = require('express-session');
 const crypto = require('crypto');
 const Contact = require('./models/Contact');
-require('./auth'); // import the passport config
+const cookieParser = require('cookie-parser');
+
 
 //CHANGES DONE
 const app = express();
+
+app.use(cookieParser());
 
 const client = new OAuth2Client(
   process.env.AUTH_CLIENT_ID,
@@ -90,6 +93,7 @@ app.get('/auth/logout', (req, res) => {
     if (err) {
       return res.status(500).send('Failed to logout.');
     }
+    res.clearCookie('user');
     res.redirect('/');
   });
 });
@@ -97,11 +101,26 @@ app.get('/auth/logout', (req, res) => {
 
 // Home Route
 app.get('/', (req, res) => {
+  let user = null;
+
   if (req.session.user) {
-    res.render('index', { user: req.session.user });
-  } else {
-    res.render('index');
+    user = req.session.user;
+
+    // Update the cookie just in case
+    res.cookie('user', JSON.stringify(user), {
+      httpOnly: true,
+      maxAge: 24 * 60 * 60 * 1000
+    });
+  } else if (req.cookies.user) {
+    // Parse user from cookie if session is missing
+    try {
+      user = JSON.parse(req.cookies.user);
+    } catch (err) {
+      console.error('Failed to parse user cookie:', err);
+    }
   }
+
+  res.render('index', { user });
 });
 
 // Home route
