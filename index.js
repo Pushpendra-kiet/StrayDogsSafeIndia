@@ -181,7 +181,7 @@ app.get('/complaints', async (req, res) => {
 // Form submission route
 app.post('/submit', async (req, res) => {
 
-        let user = null;
+  let user = null;
 
   if (req.session && req.session.user) {
     user = req.session.user;
@@ -202,14 +202,12 @@ app.post('/submit', async (req, res) => {
    return res.render('/test')
   }
 
-
-
   if (!token) {
     return res.send('⚠️ reCAPTCHA token missing.');
   }
 
   try {
-    const secretKey = '6LdCpz4rAAAAAD34Q_Dy2DbI7elrwnIcCfXWN6XU';
+    const secretKey = '6LfIa0QrAAAAAIc9ClrzUwuNBPkETjBYxqsNMZqV';
 
     const response = await axios.post(
       `https://www.google.com/recaptcha/api/siteverify`,
