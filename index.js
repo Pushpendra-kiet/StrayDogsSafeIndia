@@ -56,6 +56,15 @@ app.get('/auth/google', (req, res) => {
   res.redirect(url);
 });
 
+
+const pollSchema = new mongoose.Schema({
+  rating: Number,
+  q1: String,
+  q2: String,
+});
+
+const PollModel = mongoose.model('Poll', pollSchema);
+
 // Google OAuth Callback Route
 app.get('/auth/google/callback', async (req, res) => {
   const code = req.query.code;
