@@ -4,8 +4,8 @@ const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const USER = {}; // You can later save users in MongoDB
 
 passport.use(new GoogleStrategy({
-  clientID: '1067075470360-ujqa07afqodhi7sdbnv5he6303vjr4g2.apps.googleusercontent.com',
-  clientSecret: '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',
+  clientID: process.env.AUTH_CLIENT_ID,
+  clientSecret: process.env.AUTH_CLIENT_SECRET,
   callbackURL: 'https://saftefy-from-stray-dogs.vercel.app/auth/google/callback',
 },
 function(accessToken, refreshToken, profile, done) {
