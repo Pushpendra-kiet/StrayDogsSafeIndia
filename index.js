@@ -307,7 +307,14 @@ app.post('/contact-us', async (req, res) => {
   }
 });
 
+app.post('/submit-poll', (req, res) => {
+  const { rating, agree1, agree2 } = req.body;
+  console.log('Poll submitted:', { rating, agree1, agree2 });
 
+  // Optionally: save to database here
+
+  res.json({ success: true, message: 'Poll submitted successfully' });
+});
 
 // Start server
 const PORT = process.env.PORT || 3000;

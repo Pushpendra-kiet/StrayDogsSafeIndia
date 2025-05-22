@@ -95,6 +95,40 @@
         <button type="submit" class="btn btn-primary w-100">अपना जवाब सबमिट करें</button>
       </form>
     </div>
+    <script>
+document.getElementById('pollForm').addEventListener('submit', function (e) {
+  e.preventDefault(); // Prevent form from submitting normally
+
+  // Collect form data
+  const rating = document.getElementById('ratingRange').value;
+  const agree1 = document.getElementById('q1').checked;
+  const agree2 = document.getElementById('q2').checked;
+
+  const data = {
+    rating: parseInt(rating),
+    agree1,
+    agree2
+  };
+
+  // Send AJAX POST request
+  fetch('/submit-poll', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(data)
+  })
+  .then(res => res.json())
+  .then(response => {
+    alert('धन्यवाद! आपका जवाब सबमिट हो गया है।');
+  })
+  .catch(error => {
+    console.error('Error:', error);
+    alert('कुछ गलत हो गया। कृपया पुनः प्रयास करें।');
+  });
+});
+</script>
+
 
     <!-- Right: Image -->
     <div class="col-md-6 text-center">
