@@ -98,7 +98,7 @@ app.get('/auth/logout', (req, res) => {
 // Home Route
 app.get('/', (req, res) => {
   if (req.session.user) {
-    res.render('index', { user: req.session.user });
+    res.render('profile', { user: req.session.user });
   } else {
     res.render('index');
   }
