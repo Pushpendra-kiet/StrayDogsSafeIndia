@@ -40,6 +40,7 @@
   </li>
   <li class="nav-item">
     <% if(!user){ %>
+      console.log('user->', user)
    <a href="/auth/google">Login with Google</a>
    <% }else {%>
     <a href="/auth/logout">Logout with Google</a>
