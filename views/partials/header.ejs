@@ -46,11 +46,11 @@
   </li>
   <li class="nav-item">
       <% if (typeof user !== 'undefined') { %>
-      <h1>Welcome, <%= user.name %></h1>
+      <h4>Welcome, <%= user.name %></h4>
   <p>Email: <%= user.email %></p>
   <img src="<%= user.picture %>" alt="Profile Picture" class="profile-picture" />
   <br />
-    <form action="/auth/logout" method="GET">
+    <a href="/auth/logout">Logout</a>
       <button type="submit">Logout</button>
     </form>
   <% } else { %>
