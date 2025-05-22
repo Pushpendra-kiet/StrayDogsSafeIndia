@@ -1,7 +1,7 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const { OAuth2Client } = require('google-auth-library');
-require('dotenv').config();
+
 const axios = require('axios');
 const path = require('path');
 const mongoose = require('mongoose');
