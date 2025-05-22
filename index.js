@@ -1,5 +1,3 @@
-
-
 const express = require('express');
 const bodyParser = require('body-parser');
 const axios = require('axios');
@@ -15,8 +13,6 @@ require('./auth'); // import the passport config
 
 const app = express();
 
-
-
 app.use(session({
   secret: crypto.randomBytes(64).toString('hex'),
   resave: false,
@@ -31,20 +27,6 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.static('public'));
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
-
-const MongoStore = require('connect-mongo');
-const MONGO_URI = 'mongodb+srv://pushpendrakumar:Realme%4012345@straydogsdata.d06bomp.mongodb.net/complaints';
-
-app.use(session({
-  secret: crypto.randomBytes(64).toString('hex'),
-  resave: false,
-  saveUninitialized: false,
-  store: MongoStore.create({
-    mongoUrl: MONGO_URI,
-    collectionName: 'sessions'
-  })
-}));
-
 
 mongoose.connect('mongodb+srv://pushpendrakumar:Realme%4012345@straydogsdata.d06bomp.mongodb.net/complaints', {
   useNewUrlParser: true,
@@ -213,5 +195,4 @@ app.post('/contact-us', async (req, res) => {
 
 // Start server
 const PORT = process.env.PORT || 3000;
-//app.listen(PORT, () => console.log(`Server running at http://localhost:${PORT}`));
-module.exports = app;
+app.listen(PORT, () => console.log(`Server running at http://localhost:${PORT}`));

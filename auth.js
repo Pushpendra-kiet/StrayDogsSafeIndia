@@ -16,7 +16,6 @@ function(accessToken, refreshToken, profile, done) {
   return done(null, USER);
 }));
 
-
 passport.serializeUser((user, done) => {
   done(null, user.googleId);
 });
