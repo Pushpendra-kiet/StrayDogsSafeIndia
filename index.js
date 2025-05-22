@@ -47,31 +47,6 @@ mongoose.connect('mongodb+srv://pushpendrakumar:Realme%4012345@straydogsdata.d06
 .then(() => console.log('✅ Connected to MongoDB'))
 .catch(err => console.error('❌ Connection error:', err));
 
-app.get('/testsome', (req,res)=>{
-  
-  const testSchema = new mongoose.Schema({
-    name: String
-  });
-
-  // Create model
-  const Test = mongoose.model('Test', testSchema);
-
-  // Insert a test document
-  const testDoc = new Test({ name: 'Connection Test User' });
-
-  testDoc.save()
-    .then(doc => {
-      console.log('✅ Document inserted:', doc);
-      mongoose.disconnect(); // Close the connection
-    })
-    .catch(err => {
-      console.error('❌ Insert failed:', err);
-      mongoose.disconnect();
-    })
-    res.send('saved data')
-
-})
-
 app.get('/auth/google', (req, res) => {
   const url = client.generateAuthUrl({
     access_type: 'offline',
