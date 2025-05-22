@@ -100,7 +100,7 @@ app.get('/', (req, res) => {
   if (req.session.user) {
     res.render('index', { user: req.session.user });
   } else {
-    res.render('index');
+    res.render('index', {user: 'not logged in'});
   }
 });
 
