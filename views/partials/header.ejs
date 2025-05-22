@@ -24,6 +24,12 @@
      .testnew:hover {
   color: magenta;background-color: aquamarine;
 }
+.profile-picture {
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      object-fit: cover;
+    }
     </style>
 <ul class="nav justify-content-end" style="background-color: bisque">
   <li class="nav-item">
@@ -40,7 +46,10 @@
   </li>
   <li class="nav-item">
       <% if (typeof user !== 'undefined') { %>
-    <p>Hello, <%= user.name %>!</p>
+      <h1>Welcome, <%= user.name %></h1>
+  <p>Email: <%= user.email %></p>
+  <img src="<%= user.picture %>" alt="Profile Picture" class="profile-picture" />
+  <br />
     <form action="/auth/logout" method="GET">
       <button type="submit">Logout</button>
     </form>
