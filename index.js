@@ -241,14 +241,27 @@ app.post('/submit', async (req, res) => {
 //contact-us form
 // Form submission route
 app.post('/contact-us', async (req, res) => {
-  const { city, state, age, joinus, 'g-recaptcha-response': token } = req.body;
 
-  if (!req.isAuthenticated()) {
-    return res.render('nologin', { message: "⚠️ You must be logged in via Google to submit this form." });
+    let user = null;
+
+  if (req.session && req.session.user) {
+    user = req.session.user;
+  } else if (req.cookies && req.cookies.user) {
+    try {
+      user = JSON.parse(req.cookies.user);
+    } catch (err) {
+      console.error('Invalid cookie:', err);
+    }
   }
 
-  const name = req.user.name;
-  const email = req.user.email;
+  const { city, state, age, joinus, 'g-recaptcha-response': token } = req.body;
+
+   if (typeof user !== 'undefined' && user) {
+  var myname = user.name;
+  var myemail = user.email;  
+  } else { 
+   return res.render('/test')
+  }
 
   if (!token) {
     return res.send('⚠️ reCAPTCHA token missing.');
@@ -278,8 +291,8 @@ app.post('/contact-us', async (req, res) => {
     const joinusBool = joinus === 'on';
 
     await Contact.create({
-      name,
-      email,
+      myname,
+      myemail,
       city,
       state,
       age: ageNum,
