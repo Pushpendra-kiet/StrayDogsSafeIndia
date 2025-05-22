@@ -108,38 +108,32 @@
       </form>
     </div>
     <script>
-document.getElementById('pollForm').addEventListener('submit', function (e) {
-  e.preventDefault(); // Prevent form from submitting normally
+const formData = {
+  rating: document.getElementById('rating').value,
+  q1: document.querySelector('input[name="q1"]:checked')?.value,
+  q2: document.querySelector('input[name="q2"]:checked')?.value,
+};
 
-  // Collect form data
-  const rating = document.getElementById('ratingRange').value;
- const q1Answer = document.querySelector('input[name="q1"]:checked').value;
-const q2Answer = document.querySelector('input[name="q2"]:checked').value;
-
-
-  const data = {
-    rating: parseInt(rating),
-   q1Answer,
-    q2Answer
-  };
-
-  // Send AJAX POST request
-  fetch('/submit-poll', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify(data)
-  })
-  .then(res => res.json())
-  .then(response => {
-    alert('धन्यवाद! आपका जवाब सबमिट हो गया है।');
-  })
-  .catch(error => {
-    console.error('Error:', error);
+fetch('/submit-poll', {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify(formData)
+})
+.then(response => response.json())
+.then(data => {
+  if (data.success) {
+    alert('धन्यवाद! आपका उत्तर सबमिट हो गया है।');
+  } else {
     alert('कुछ गलत हो गया। कृपया पुनः प्रयास करें।');
-  });
+  }
+})
+.catch(error => {
+  console.error('Error:', error);
+  alert('नेटवर्क त्रुटि। कृपया बाद में प्रयास करें।');
 });
+
 </script>
 
 

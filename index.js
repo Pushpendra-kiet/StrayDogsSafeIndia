@@ -307,14 +307,24 @@ app.post('/contact-us', async (req, res) => {
   }
 });
 
-app.post('/submit-poll', (req, res) => {
-  const { rating, agree1, agree2 } = req.body;
-  console.log('Poll submitted:', { rating, agree1, agree2 });
+app.post('/submit-poll', async (req, res) => {
+  try {
+    const { rating, q1, q2 } = req.body;
 
-  // Optionally: save to database here
+    if (!rating || !q1 || !q2) {
+      return res.json({ success: false, message: "Missing fields" });
+    }
 
-  res.json({ success: true, message: 'Poll submitted successfully' });
+    const pollData = new PollModel({ rating, q1, q2 });
+    await pollData.save();
+
+    return res.json({ success: true });
+  } catch (err) {
+    console.error("Poll Submit Error:", err);
+    return res.json({ success: false });
+  }
 });
+
 
 // Start server
 const PORT = process.env.PORT || 3000;
