@@ -196,7 +196,6 @@ async function fetchComplaints() {
 // GET /complaints (initial render)
 app.get('/complaints', async (req, res) => {
   let user = null;
-
   if (req.session && req.session.user) {
     user = req.session.user;
   } else if (req.cookies && req.cookies.user) {
@@ -216,7 +215,7 @@ app.get('/complaints', async (req, res) => {
     res.render('complaints', {
       complaints: paginated,
       hasMore: start + limit < allComplaints.length,
-      user: req.user || null,
+      user: user || null,
     });
   } catch (err) {
     console.error('Error loading complaints:', err);
