@@ -1,23 +1,50 @@
 <%- include('partials/header') %>
-  <div class="container mt-5">
-    <h1 class="mb-4">Recent Complaints</h1>
+<div class="container mt-5">
+  <h1 class="mb-4">Recent Complaints</h1>
+  <div id="complaints-container"></div>
+  <div class="text-center mt-3">
+    <button id="loadMoreBtn" class="btn btn-outline-primary">Load More</button>
+  </div>
+</div>
 
-    <% if (complaints.length === 0) { %>
-      <p>No complaints have been submitted yet.</p>
-    <% } else { %>
-      <% complaints.forEach(complaint => { %>
-        <div class="card mb-3 shadow-sm">
-          <div class="card-body">
-            <h5 class="card-title"><span class="badge text-bg-info"><%= complaint.name %></span></h5>
-            <p class="card-text"><%= complaint.message %></p>
-            <p class="text-muted" style="text-align: right;"><small><strong>Date of Incident:</strong> <%= complaint.doi.toLocaleString() %></small></p>
-            <p class="text-muted" style="text-align: right;"><small>City<%= complaint.city %>, State <%= complaint.state %></small></p>
-            <p class="text-muted"><small><strong>Reported on:<%= complaint.createdAt.toLocaleString() %></strong></small></p>
-          </div>
-        </div>
-      <% }); %>
-    <% } %>
+<script>
+  let currentPage = 1;
+  const limit = 10;
 
+  async function loadComplaints() {
+    const res = await fetch(`/complaints?page=${currentPage}&limit=${limit}`);
+    const data = await res.json();
+
+    const container = document.getElementById('complaints-container');
+
+    data.complaints.forEach(c => {
+      const card = document.createElement('div');
+      card.className = 'card mb-3 shadow-sm';
+      card.innerHTML = `
+        <div class="card-body">
+          <h5 class="card-title"><span class="badge text-bg-info">${c.name}</span></h5>
+          <p class="card-text">${c.message}</p>
+          <p class="text-muted text-end"><small><strong>Date of Incident:</strong> ${new Date(c.doi).toLocaleString()}</small></p>
+          <p class="text-muted text-end"><small>${c.city}, ${c.state}</small></p>
+          <p class="text-muted"><small><strong>Reported on:</strong> ${new Date(c.createdAt).toLocaleString()}</small></p>
+        </div>`;
+      container.appendChild(card);
+    });
+
+    if (!data.hasMore) {
+      document.getElementById('loadMoreBtn').style.display = 'none';
+    } else {
+      currentPage++;
+    }
+  }
+
+  document.getElementById('loadMoreBtn').addEventListener('click', loadComplaints);
+
+  // Load first page on load
+  window.onload = loadComplaints;
+</script>
+
+<div>
     <a href="/" class="btn btn-primary mt-3">Back to Home</a>
   </div>
 <%- include('partials/footer') %>
