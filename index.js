@@ -193,7 +193,7 @@ async function fetchComplaints() {
 }
 
 // GET /complaints (initial render)
-router.get('/complaints', async (req, res) => {
+app.get('/complaints', async (req, res) => {
   try {
     const page = 1;
     const limit = 10;
@@ -213,7 +213,7 @@ router.get('/complaints', async (req, res) => {
 });
 
 // GET /complaints/api?page=2
-router.get('/complaints/api', async (req, res) => {
+app.get('/complaints/api', async (req, res) => {
   try {
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
