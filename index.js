@@ -212,7 +212,7 @@ app.post('/submit-complaints', async (req, res) => {
     return res.render('/test');
   }
 
-  const { message, doi, city, state } = req.body;
+  const { message, doi, city, state, 'g-recaptcha-response': token } = req.body;
     if (!token) {
     return res.send('⚠️ reCAPTCHA token missing.');
   }
