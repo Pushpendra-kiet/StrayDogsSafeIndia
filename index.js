@@ -6,6 +6,7 @@ const axios = require('axios');
 const path = require('path');
 const mongoose = require('mongoose');
 const Complaint = require('./models/Complaint');
+const Poll = require('./models/Poll');
 const session = require('express-session');
 const crypto = require('crypto');
 const Contact = require('./models/Contact');
@@ -317,22 +318,26 @@ app.post('/contact-us', async (req, res) => {
 });
 
 app.post('/submit-poll', async (req, res) => {
-  try {
-    const { rating, q1, q2 } = req.body;
+  const { name, email, rating, q1, q2 } = req.body;
 
-    if (!rating || !q1 || !q2) {
-      return res.json({ success: false, message: "Missing fields" });
+  try {
+    // Check for duplicate vote
+    const existingPoll = await Poll.findOne({ email });
+    if (existingPoll) {
+      return res.send("आप पहले ही मतदान कर चुके हैं।");
     }
 
-    const pollData = new PollModel({ rating, q1, q2 });
-    await pollData.save();
+    // Save new poll
+    const newPoll = new Poll({ name, email, rating, q1, q2 });
+    await newPoll.save();
 
-    return res.json({ success: true });
-  } catch (err) {
-    console.error("Poll Submit Error:", err);
-    return res.json({ success: false });
+    return res.send("धन्यवाद! आपका मतदान सफलतापूर्वक दर्ज किया गया है।");
+  } catch (error) {
+    console.error("Poll Submission Error:", error);
+    return res.status(500).send("कुछ गलत हो गया। कृपया पुनः प्रयास करें।");
   }
 });
+
 
 
 // Start server
