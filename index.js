@@ -1,7 +1,6 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const { OAuth2Client } = require('google-auth-library');
-
 const axios = require('axios');
 const path = require('path');
 const mongoose = require('mongoose');
@@ -57,14 +56,6 @@ app.get('/auth/google', (req, res) => {
   res.redirect(url);
 });
 
-
-const pollSchema = new mongoose.Schema({
-  rating: Number,
-  q1: String,
-  q2: String,
-});
-
-const PollModel = mongoose.model('Poll', pollSchema);
 
 // Google OAuth Callback Route
 app.get('/auth/google/callback', async (req, res) => {
@@ -317,26 +308,7 @@ app.post('/contact-us', async (req, res) => {
   }
 });
 
-app.post('/submit-poll', async (req, res) => {
-  const { name, email, rating, q1, q2 } = req.body;
 
-  try {
-    // Check for duplicate vote
-    const existingPoll = await Poll.findOne({ email });
-    if (existingPoll) {
-      return res.send("आप पहले ही मतदान कर चुके हैं।");
-    }
-
-    // Save new poll
-    const newPoll = new Poll({ name, email, rating, q1, q2 });
-    await newPoll.save();
-
-    return res.send("धन्यवाद! आपका मतदान सफलतापूर्वक दर्ज किया गया है।");
-  } catch (error) {
-    console.error("Poll Submission Error:", error);
-    return res.status(500).send("कुछ गलत हो गया। कृपया पुनः प्रयास करें।");
-  }
-});
 
 
 
