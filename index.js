@@ -357,7 +357,25 @@ app.post('/poll', async (req, res) => {
 
 
 app.post('/submit-poll', async (req, res) => {
-  const { name, email, rating, q1, q2 } = req.body;
+    let user = null;
+
+  if (req.session && req.session.user) {
+    user = req.session.user;
+  } else if (req.cookies && req.cookies.user) {
+    try {
+      user = JSON.parse(req.cookies.user);
+    } catch (err) {
+      console.error('Invalid cookie:', err);
+    }
+  }
+   if (typeof user !== 'undefined' && user) {
+  var myname = user.name;
+  var myemail = user.email;  
+  } else { 
+   return res.render('/test')
+  }
+  
+  const { rating, q1, q2 } = req.body;
 
   try {
     const authClient = await auth.getClient();
@@ -365,8 +383,8 @@ app.post('/submit-poll', async (req, res) => {
 
     const row = [
       new Date().toLocaleString(),
-      name,
-      email,
+      myname,
+      myemail,
       rating,
       q1,
       q2,
