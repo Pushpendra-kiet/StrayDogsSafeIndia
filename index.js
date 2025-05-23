@@ -262,63 +262,6 @@ router.post('/submit', async (req, res) => {
 
 
 
-// Form submission route
-app.post('/submit_old', async (req, res) => {
-
-  let user = null;
-
-  if (req.session && req.session.user) {
-    user = req.session.user;
-  } else if (req.cookies && req.cookies.user) {
-    try {
-      user = JSON.parse(req.cookies.user);
-    } catch (err) {
-      console.error('Invalid cookie:', err);
-    }
-  }
-
-  const { message, doi, city, state, 'g-recaptcha-response': token } = req.body;
-
-  if (typeof user !== 'undefined' && user) {
-  var myname = user.name;
-  var myemail = user.email;  
-  } else { 
-   return res.render('/test')
-  }
-
-  if (!token) {
-    return res.send('⚠️ reCAPTCHA token missing.');
-  }
-
-  try {
-    const secretKey = '6LdCpz4rAAAAAD34Q_Dy2DbI7elrwnIcCfXWN6XU';
-
-    const response = await axios.post(
-      `https://www.google.com/recaptcha/api/siteverify`,
-      null,
-      {
-        params: {
-          secret: secretKey,
-          response: token,
-        },
-      }
-    );
-
-    const data = response.data;
-
-    if (!data.success || data.score < 0.5 || data.action !== 'submit') {
-      return res.send('⚠️ Captcha failed. Please try again or check for suspicious activity.');
-    }
-
-    // ✅ Save complaint with authenticated user's name
-    await Complaint.create({ name: myname, message, city, state, doi, email:myemail });
-    return res.redirect('/');
-
-  } catch (err) {
-    console.error('Captcha error:', err);
-    res.status(500).send('❌ Server error during captcha verification.');
-  }
-});
 //contact-us form
 // Form submission route
 app.post('/contact-us', async (req, res) => {
@@ -388,34 +331,6 @@ app.post('/contact-us', async (req, res) => {
   }
 });
 
-app.post('/poll', async (req, res) => {
-  const { name, email, rating, agreeSolution, joinMovement } = req.body;
-
-  if (!email) {
-    return res.status(400).send("User not logged in or email missing.");
-  }
-
-  try {
-    // Check if the user has already submitted a poll
-    const existingEntry = await Poll.findOne({ email });
-
-    if (existingEntry) {
-      return res.send("आप पहले ही मतदान कर चुके हैं। धन्यवाद।");
-    }
-
-    // Save the new poll entry
-    const newPoll = new Poll({ name, email, rating, agreeSolution, joinMovement });
-    await newPoll.save();
-
-    res.send("आपका मतदान सफलतापूर्वक दर्ज कर लिया गया है। धन्यवाद!");
-
-  } catch (err) {
-    console.error("Poll submission error:", err);
-    res.status(500).send("कुछ गलत हो गया। कृपया पुनः प्रयास करें।");
-  }
-});
-
-
 app.post('/submit-poll', async (req, res) => {
   let user = null;
 
@@ -484,9 +399,6 @@ app.post('/submit-poll', async (req, res) => {
     res.send('<h2>कुछ गलत हो गया। कृपया पुनः प्रयास करें।</h2>');
   }
 });
-
-
-
 
 // Start server
 const PORT = process.env.PORT || 3000;
