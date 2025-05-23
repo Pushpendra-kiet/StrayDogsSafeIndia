@@ -19,6 +19,7 @@
     "express-recaptcha": "^5.1.0",
     "express-session": "^1.18.1",
     "google-auth-library": "^9.15.1",
+    "googleapis": "^149.0.0",
     "mongoose": "^8.15.0",
     "node-fetch": "^3.3.2",
     "passport": "^0.7.0",
