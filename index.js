@@ -301,11 +301,11 @@ app.post('/contact-us', async (req, res) => {
     const joinusBool = joinus === 'on';
 
     await Contact.create({
-      myname,
-      myemail,
+      name:myname,
       city,
       state,
       age: ageNum,
+      email:myemail,
       joinus: joinusBool,
     });
 
