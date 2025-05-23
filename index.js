@@ -213,10 +213,29 @@ app.post('/submit-complaints', async (req, res) => {
   }
 
   const { message, doi, city, state } = req.body;
-  console.log('i am inside the end point')
+    if (!token) {
+    return res.send('⚠️ reCAPTCHA token missing.');
+  }
   try {
     
-    // Optional: Add reCAPTCHA verification here if needed
+   const secretKey = '6LdCpz4rAAAAAD34Q_Dy2DbI7elrwnIcCfXWN6XU';
+
+    const response = await axios.post(
+      `https://www.google.com/recaptcha/api/siteverify`,
+      null,
+      {
+        params: {
+          secret: secretKey,
+          response: token,
+        },
+      }
+    );
+
+    const data = response.data;
+
+    if (!data.success || data.score < 0.5 || data.action !== 'submit') {
+      return res.send('⚠️ Captcha failed. Please try again or check for suspicious activity.');
+    }
 
     const authClient = await auth.getClient();
     const sheets = google.sheets({ version: 'v4', auth: authClient });
@@ -230,8 +249,6 @@ app.post('/submit-complaints', async (req, res) => {
       city,
       state,
     ];
-
-
     await sheets.spreadsheets.values.append({
       spreadsheetId: '17IAiZgj9jWjf7gmVKkCv2YgZMIN_uOFSrU-pOtVgapA',
       range: 'voices', // Change to your desired sheet name
