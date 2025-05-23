@@ -9,12 +9,15 @@ const session = require('express-session');
 const crypto = require('crypto');
 const Contact = require('./models/Contact');
 const cookieParser = require('cookie-parser');
-
+const { google } = require('googleapis');
+//some
 
 //CHANGES DONE
 const app = express();
 
 app.use(cookieParser());
+
+const credentials = JSON.parse(process.env.GOOGLE_APPLICATION_CREDENTIALS_JSON);
 
 const client = new OAuth2Client(
   process.env.AUTH_CLIENT_ID,
@@ -37,6 +40,14 @@ app.use(express.static(__dirname + '/public'))
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 
+// Auth client
+const auth = new google.auth.GoogleAuth({
+  credentials: credentials,
+  scopes: ['https://www.googleapis.com/auth/spreadsheets'],
+});
+
+// Your spreadsheet ID (from URL of Google Sheets)
+const SID= process.env.SPREADSHEET_ID;
 
 
 mongoose.connect('mongodb+srv://pushpendrakumar:Realme%4012345@straydogsdata.jp0ruon.mongodb.net/complaints', {
@@ -341,6 +352,40 @@ app.post('/poll', async (req, res) => {
   } catch (err) {
     console.error("Poll submission error:", err);
     res.status(500).send("कुछ गलत हो गया। कृपया पुनः प्रयास करें।");
+  }
+});
+
+
+app.post('/submit-poll', async (req, res) => {
+  const { name, email, rating, q1, q2 } = req.body;
+
+  try {
+    const authClient = await auth.getClient();
+    const sheets = google.sheets({ version: 'v4', auth: authClient });
+
+    const row = [
+      new Date().toLocaleString(),
+      name,
+      email,
+      rating,
+      q1,
+      q2,
+    ];
+
+    await sheets.spreadsheets.values.append({
+      spreadsheetId: SID,
+      range: 'poll_data',
+      valueInputOption: 'USER_ENTERED',
+      insertDataOption: 'INSERT_ROWS',
+      requestBody: {
+        values: [row],
+      },
+    });
+
+    res.send('<h2>Thank you for your submission!</h2>');
+  } catch (error) {
+    console.error('Error submitting poll:', error);
+    res.send('<h2>Something went wrong. Please try again.</h2>');
   }
 });
 
