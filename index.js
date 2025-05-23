@@ -66,17 +66,6 @@ app.get('/auth/google', (req, res) => {
   res.redirect(url);
 });
 
-const pollSchema = new mongoose.Schema({
-  name: String,
-  email: { type: String, unique: true }, // ensures one vote per user
-  rating: Number,
-  agreeSolution: String,
-  joinMovement: String,
-  submittedAt: { type: Date, default: Date.now }
-});
-
-const Poll = mongoose.model('Poll', pollSchema);
-
 // Google OAuth Callback Route
 app.get('/auth/google/callback', async (req, res) => {
   const code = req.query.code;
@@ -179,32 +168,10 @@ app.get('/contact-us', (req, res) => {
   res.render('contact-us',{ user });
 });
 
-app.get('/complaints', async (req, res) => {
-
-      let user = null;
-
-  if (req.session && req.session.user) {
-    user = req.session.user;
-  } else if (req.cookies && req.cookies.user) {
-    try {
-      user = JSON.parse(req.cookies.user);
-    } catch (err) {
-      console.error('Invalid cookie:', err);
-    }
-  }
-
-  try {
-    const complaints = await Complaint.find().sort({ createdAt: -1 }).limit(10);
-    res.render('complaints', { complaints, user });
-  } catch (err) {
-    console.error(err);
-    res.status(500).send('❌ Error fetching complaints');
-  }
-});
 //new submit
 router.post('/submit', async (req, res) => {
-
-  let user = null;
+  try {
+      let user = null;
 
   if (req.session && req.session.user) {
     user = req.session.user;
@@ -222,9 +189,6 @@ router.post('/submit', async (req, res) => {
   } else {
     return res.render('/test');
   }
-
-  
-  try {
     const { message, doi, city, state } = req.body;
 
     // Optional: Add reCAPTCHA verification here if needed
