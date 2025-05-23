@@ -357,7 +357,7 @@ app.post('/poll', async (req, res) => {
 
 
 app.post('/submit-poll', async (req, res) => {
-    let user = null;
+  let user = null;
 
   if (req.session && req.session.user) {
     user = req.session.user;
@@ -368,19 +368,36 @@ app.post('/submit-poll', async (req, res) => {
       console.error('Invalid cookie:', err);
     }
   }
-   if (typeof user !== 'undefined' && user) {
-  var myname = user.name;
-  var myemail = user.email;  
-  } else { 
-   return res.render('/test')
+
+  if (typeof user !== 'undefined' && user) {
+    var myname = user.name;
+    var myemail = user.email;
+  } else {
+    return res.render('/test');
   }
-  
+
   const { rating, q1, q2 } = req.body;
 
   try {
     const authClient = await auth.getClient();
     const sheets = google.sheets({ version: 'v4', auth: authClient });
 
+    // Step 1: Fetch existing data
+    const readRes = await sheets.spreadsheets.values.get({
+      spreadsheetId: '1YI0s9MprWcInk3Gol0w9Is5KCcYFTDRnGVNDPwwjRMw',
+      range: 'poll_data',
+    });
+
+    const rows = readRes.data.values || [];
+
+    // Step 2: Check if email already exists in column 3 (index 2)
+    const alreadyVoted = rows.some(row => row[2] === myemail);
+
+    if (alreadyVoted) {
+      return res.send('<h2>आप पहले ही मतदान कर चुके हैं। केवल एक बार मतदान की अनुमति है।</h2>');
+    }
+
+    // Step 3: Append new row
     const row = [
       new Date().toLocaleString(),
       myname,
@@ -400,12 +417,14 @@ app.post('/submit-poll', async (req, res) => {
       },
     });
 
-    res.send('<h2>Thank you for your submission!</h2>');
+    res.send('<h2>धन्यवाद! आपका मतदान सफलतापूर्वक सबमिट हो गया है।</h2>');
+
   } catch (error) {
     console.error('Error submitting poll:', error);
-    res.send('<h2>Something went wrong. Please try again.</h2>');
+    res.send('<h2>कुछ गलत हो गया। कृपया पुनः प्रयास करें।</h2>');
   }
 });
+
 
 
 
