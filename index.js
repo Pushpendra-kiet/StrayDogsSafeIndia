@@ -56,6 +56,16 @@ app.get('/auth/google', (req, res) => {
   res.redirect(url);
 });
 
+const pollSchema = new mongoose.Schema({
+  name: String,
+  email: { type: String, unique: true }, // ensures one vote per user
+  rating: Number,
+  agreeSolution: String,
+  joinMovement: String,
+  submittedAt: { type: Date, default: Date.now }
+});
+
+const Poll = mongoose.model('Poll', pollSchema);
 
 // Google OAuth Callback Route
 app.get('/auth/google/callback', async (req, res) => {
