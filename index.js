@@ -168,61 +168,66 @@ app.get('/contact-us', (req, res) => {
   res.render('contact-us',{ user });
 });
 
-// GET /complaints?page=1&limit=10
-app.get('/complaints', async (req, res) => {
-    let user = null;
+async function fetchComplaints() {
+  const authClient = await auth.getClient();
+  const sheets = google.sheets({ version: 'v4', auth: authClient });
 
-  if (req.session && req.session.user) {
-    user = req.session.user;
-  } else if (req.cookies && req.cookies.user) {
-    try {
-      user = JSON.parse(req.cookies.user);
-    } catch (err) {
-      console.error('Invalid cookie:', err);
-    }
+  const response = await sheets.spreadsheets.values.get({
+    spreadsheetId: '17IAiZgj9jWjf7gmVKkCv2YgZMIN_uOFSrU-pOtVgapA',
+    range: 'voices', // Sheet name
+  });
+
+  const rows = response.data.values || [];
+
+  return rows
+    .slice(1) // Skip header
+    .map(row => ({
+      createdAt: new Date(row[0]),
+      message: row[1] || '',
+      doi: new Date(row[2]) || '',
+      city: row[3] || '',
+      state: row[4] || '',
+      name: 'Anonymous', // Or fetch actual name if available
+    }))
+    .sort((a, b) => b.createdAt - a.createdAt); // Latest first
+}
+
+// GET /complaints (initial render)
+router.get('/complaints', async (req, res) => {
+  try {
+    const page = 1;
+    const limit = 10;
+    const allComplaints = await fetchComplaints();
+    const start = (page - 1) * limit;
+    const paginated = allComplaints.slice(start, start + limit);
+
+    res.render('complaints', {
+      complaints: paginated,
+      hasMore: start + limit < allComplaints.length,
+      user: req.user || null,
+    });
+  } catch (err) {
+    console.error('Error loading complaints:', err);
+    res.status(500).send('Server error.');
   }
+});
 
+// GET /complaints/api?page=2
+router.get('/complaints/api', async (req, res) => {
   try {
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
-
-    const authClient = await auth.getClient();
-    const sheets = google.sheets({ version: 'v4', auth: authClient });
-
-    const response = await sheets.spreadsheets.values.get({
-      spreadsheetId: '17IAiZgj9jWjf7gmVKkCv2YgZMIN_uOFSrU-pOtVgapA',
-      range: 'voices', // Sheet name
-    });
-
-    const rows = response.data.values;
-    if (!rows || rows.length <= 1) {
-      return res.json({ complaints: [], hasMore: false });
-    }
-
-    const allComplaints = rows.slice(1).map(row => ({
-      createdAt: new Date(row[0]),
-      message: row[1] || 'No message',
-      doi: new Date(row[2]),
-      city: row[3] || 'Unknown',
-      state: row[4] || 'Unknown',
-      name: 'Anonymous'
-    }));
-
-    // Sort by date descending
-    const sorted = allComplaints.sort((a, b) => b.createdAt - a.createdAt);
-
+    const allComplaints = await fetchComplaints();
     const start = (page - 1) * limit;
-    const paginated = sorted.slice(start, start + limit);
+    const paginated = allComplaints.slice(start, start + limit);
 
-    res.render('complaints.ejs',{
+    res.json({
       complaints: paginated,
-      user : user,
-      hasMore: start + limit < sorted.length
+      hasMore: start + limit < allComplaints.length,
     });
-
-  } catch (error) {
-    console.error('Error loading complaints:', error);
-    res.status(500).json({ error: 'Failed to load complaints' });
+  } catch (err) {
+    console.error('API Error:', err);
+    res.status(500).json({ error: 'Failed to fetch complaints' });
   }
 });
 
