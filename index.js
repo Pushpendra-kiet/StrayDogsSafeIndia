@@ -240,7 +240,7 @@ app.post('/submit', async (req, res) => {
     }
 
     // ✅ Save complaint with authenticated user's name
-    await Complaint.create({ myname, myemail, message, doi, city, state });
+    await Complaint.create({ name: myname, message, city, state, doi, email:myemail });
     return res.redirect('/');
 
   } catch (err) {
