@@ -40,9 +40,10 @@ app.set('views', path.join(__dirname, 'views'));
 
 
 mongoose.connect('mongodb+srv://pushpendrakumar:Realme%4012345@straydogsdata.d06bomp.mongodb.net/complaints', {
+  keepAlive: true,
   useNewUrlParser: true,
   useUnifiedTopology: true,
-  bufferTimeoutMS: 30000
+  bufferTimeoutMS: 10000
 })
 .then(() => console.log('✅ Connected to MongoDB'))
 .catch(err => console.error('❌ Connection error:', err));
