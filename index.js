@@ -43,7 +43,7 @@ mongoose.connect('mongodb+srv://pushpendrakumar:Realme@12345@straydogsdata.jp0ru
   keepAlive: true,
   useNewUrlParser: true,
   useUnifiedTopology: true,
-  bufferTimeoutMS: 10000
+  bufferTimeoutMS: 30000
 })
 .then(() => console.log('✅ Connected to MongoDB'))
 .catch(err => console.error('❌ Connection error:', err));
