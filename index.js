@@ -10,9 +10,6 @@ const crypto = require('crypto');
 const Contact = require('./models/Contact');
 const cookieParser = require('cookie-parser');
 const { google } = require('googleapis');
-//some
-
-//CHANGES DONE
 const app = express();
 
 app.use(cookieParser());
@@ -171,24 +168,6 @@ app.get('/contact-us', (req, res) => {
 //new submit
 router.post('/submit', async (req, res) => {
   try {
-      let user = null;
-
-  if (req.session && req.session.user) {
-    user = req.session.user;
-  } else if (req.cookies && req.cookies.user) {
-    try {
-      user = JSON.parse(req.cookies.user);
-    } catch (err) {
-      console.error('Invalid cookie:', err);
-    }
-  }
-
-  if (typeof user !== 'undefined' && user) {
-    var myname = user.name;
-    var myemail = user.email;
-  } else {
-    return res.render('/test');
-  }
     const { message, doi, city, state } = req.body;
 
     // Optional: Add reCAPTCHA verification here if needed
@@ -198,8 +177,6 @@ router.post('/submit', async (req, res) => {
 
     const row = [
       new Date().toLocaleString(), // Timestamp
-      myname,
-      email,
       message,
       doi,
       city,
@@ -217,13 +194,12 @@ router.post('/submit', async (req, res) => {
     });
 
     // On success, render a confirmation or redirect
-    res.send('thank-you'); // Replace with your actual success page
+    res.render('thank-you'); // Replace with your actual success page
   } catch (error) {
     console.error('Error submitting complaint:', error);
     res.status(500).send('Something went wrong while submitting the complaint.');
   }
 });
-
 
 
 //contact-us form
