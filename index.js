@@ -5,7 +5,6 @@ const axios = require('axios');
 const path = require('path');
 const mongoose = require('mongoose');
 const Complaint = require('./models/Complaint');
-const Poll = require('./models/Poll');
 const session = require('express-session');
 const crypto = require('crypto');
 const Contact = require('./models/Contact');
