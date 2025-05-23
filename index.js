@@ -308,7 +308,32 @@ app.post('/contact-us', async (req, res) => {
   }
 });
 
+app.post('/poll', async (req, res) => {
+  const { name, email, rating, agreeSolution, joinMovement } = req.body;
 
+  if (!email) {
+    return res.status(400).send("User not logged in or email missing.");
+  }
+
+  try {
+    // Check if the user has already submitted a poll
+    const existingEntry = await Poll.findOne({ email });
+
+    if (existingEntry) {
+      return res.send("आप पहले ही मतदान कर चुके हैं। धन्यवाद।");
+    }
+
+    // Save the new poll entry
+    const newPoll = new Poll({ name, email, rating, agreeSolution, joinMovement });
+    await newPoll.save();
+
+    res.send("आपका मतदान सफलतापूर्वक दर्ज कर लिया गया है। धन्यवाद!");
+
+  } catch (err) {
+    console.error("Poll submission error:", err);
+    res.status(500).send("कुछ गलत हो गया। कृपया पुनः प्रयास करें।");
+  }
+});
 
 
 
