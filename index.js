@@ -191,6 +191,65 @@ app.get('/complaints', async (req, res) => {
   }
 });
 
+app.post('/submit-complaints', async (req, res) => {
+
+      let user = null;
+
+  if (req.session && req.session.user) {
+    user = req.session.user;
+  } else if (req.cookies && req.cookies.user) {
+    try {
+      user = JSON.parse(req.cookies.user);
+    } catch (err) {
+      console.error('Invalid cookie:', err);
+    }
+  }
+
+  if (typeof user !== 'undefined' && user) {
+    var myname = user.name;
+    var myemail = user.email;
+  } else {
+    return res.render('/test');
+  }
+
+  const { message, doi, city, state } = req.body;
+  console.log('i am inside the end point')
+  try {
+    
+    // Optional: Add reCAPTCHA verification here if needed
+
+    const authClient = await auth.getClient();
+    const sheets = google.sheets({ version: 'v4', auth: authClient });
+
+    const row = [
+      new Date().toLocaleString(), // Timestamp
+      myemail,
+      myname,
+      message,
+      doi,
+      city,
+      state,
+    ];
+
+
+    await sheets.spreadsheets.values.append({
+      spreadsheetId: '17IAiZgj9jWjf7gmVKkCv2YgZMIN_uOFSrU-pOtVgapA',
+      range: 'voices', // Change to your desired sheet name
+      valueInputOption: 'USER_ENTERED',
+      insertDataOption: 'INSERT_ROWS',
+      requestBody: {
+        values: [row],
+      },
+    });
+
+    // On success, render a confirmation or redirect
+    res.send('thank-you'); // Replace with your actual success page
+  } catch (error) {
+    console.error('Error submitting complaint:', error);
+    res.status(500).send('Something went wrong while submitting the complaint.');
+  }
+});
+
 
 //contact-us form
 // Form submission route
