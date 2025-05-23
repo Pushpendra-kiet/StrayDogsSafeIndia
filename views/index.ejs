@@ -20,62 +20,64 @@
    <hr>
 
    <div class="container py-5">
-  <div class="row shadow rounded bg-light" style="background: linear-gradient(to right, #f0f8ff, #e6f7ff); border: 2px solid #d1e0e0;">
-    
-    <!-- Form (Left Column) -->
-    <div class="col-md-6 p-4">
-      <h3 class="text-primary mb-4">🐾 जनमत सर्वेक्षण</h3>
+  <div class="row justify-content-center">
+    <div class="col-lg-8 shadow rounded bg-white p-4" style="background: linear-gradient(to right, #e0f7fa, #f0fcff); border: 1px solid #cce7e8;">
+      
+      <h3 class="text-center text-primary fw-bold mb-4">🐾 जनमत सर्वेक्षण</h3>
 
-      <form action="/poll" method="POST">
+      <form action="/poll" method="POST" novalidate>
 
-        <!-- Rating Question -->
+        <!-- Rating Slider -->
         <div class="mb-4">
-          <label class="form-label fw-bold">1. कृपया समस्या की गंभीरता को 1 से 10 तक रेट करें:</label>
+          <label class="form-label fw-semibold">1. कृपया समस्या की गंभीरता को 1 से 10 तक रेट करें:</label>
           <input type="range" class="form-range" name="rating" min="1" max="10" step="1" required>
+          <div class="d-flex justify-content-between">
+            <small>1</small>
+            <small>10</small>
+          </div>
         </div>
 
         <!-- Question 1 -->
         <div class="mb-4">
-          <label class="form-label fw-bold">2. क्या आप मानते हैं कि आवारा कुत्तों की समस्या के लिए मानवीय समाधान की आवश्यकता है?</label>
-          <div>
-            <div class="form-check form-check-inline">
-              <input class="form-check-input" type="radio" name="agreeSolution" value="हाँ" required>
-              <label class="form-check-label">हाँ</label>
-            </div>
-            <div class="form-check form-check-inline">
-              <input class="form-check-input" type="radio" name="agreeSolution" value="नहीं">
-              <label class="form-check-label">नहीं</label>
-            </div>
+          <label class="form-label fw-semibold">2. क्या आप मानते हैं कि आवारा कुत्तों की समस्या के लिए मानवीय समाधान की आवश्यकता है?</label>
+          <div class="btn-group d-flex" role="group">
+            <input type="radio" class="btn-check" name="agreeSolution" id="solutionYes" value="हाँ" required>
+            <label class="btn btn-outline-primary flex-fill" for="solutionYes">हाँ</label>
+
+            <input type="radio" class="btn-check" name="agreeSolution" id="solutionNo" value="नहीं">
+            <label class="btn btn-outline-primary flex-fill" for="solutionNo">नहीं</label>
           </div>
         </div>
 
         <!-- Question 2 -->
         <div class="mb-4">
-          <label class="form-label fw-bold">3. क्या आप इस आंदोलन में शामिल होना चाहते हैं?</label>
-          <div>
-            <div class="form-check form-check-inline">
-              <input class="form-check-input" type="radio" name="joinMovement" value="हाँ" required>
-              <label class="form-check-label">हाँ</label>
-            </div>
-            <div class="form-check form-check-inline">
-              <input class="form-check-input" type="radio" name="joinMovement" value="नहीं">
-              <label class="form-check-label">नहीं</label>
-            </div>
+          <label class="form-label fw-semibold">3. क्या आप इस आंदोलन में शामिल होना चाहते हैं?</label>
+          <div class="btn-group d-flex" role="group">
+            <input type="radio" class="btn-check" name="joinMovement" id="joinYes" value="हाँ" required>
+            <label class="btn btn-outline-success flex-fill" for="joinYes">हाँ</label>
+
+            <input type="radio" class="btn-check" name="joinMovement" id="joinNo" value="नहीं">
+            <label class="btn btn-outline-success flex-fill" for="joinNo">नहीं</label>
           </div>
         </div>
 
-        <!-- Hidden fields -->
+        <!-- Conditional Hidden Fields -->
         <% if (typeof user !== 'undefined' && user) { %>
           <input type="hidden" name="name" value="<%= user.name %>">
           <input type="hidden" name="email" value="<%= user.email %>">
-          <button type="submit" class="btn btn-success mt-3 shadow">सबमिट करें</button>
+          <button type="submit" class="btn btn-success w-100 mt-4 shadow-sm">✅ सबमिट करें</button>
         <% } else { %>
-          <p class="text-danger">कृपया पहले लॉगिन करें ताकि आप मतदान कर सकें।</p>
-          <button type="submit" class="btn btn-secondary mt-3" disabled>सबमिट करें</button>
+          <div class="alert alert-warning text-center" role="alert">
+            कृपया पहले लॉगिन करें ताकि आप मतदान कर सकें।
+          </div>
+          <button type="submit" class="btn btn-secondary w-100 mt-2" disabled>सबमिट करें</button>
         <% } %>
 
       </form>
     </div>
+  </div>
+</div>
+
 
     <!-- Image (Right Column) -->
     <div class="col-md-6 d-flex align-items-center justify-content-center p-4">
