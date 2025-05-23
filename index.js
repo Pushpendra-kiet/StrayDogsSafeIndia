@@ -39,7 +39,7 @@ app.set('views', path.join(__dirname, 'views'));
 
 
 
-mongoose.connect('mongodb+srv://pushpendrakumar:Realme%4012345@straydogsdata.d06bomp.mongodb.net/complaints', {
+mongoose.connect('mongodb+srv://pushpendrakumar:Realme@12345@straydogsdata.jp0ruon.mongodb.net/complaints', {
   keepAlive: true,
   useNewUrlParser: true,
   useUnifiedTopology: true,
