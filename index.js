@@ -195,6 +195,17 @@ async function fetchComplaints() {
 
 // GET /complaints (initial render)
 app.get('/complaints', async (req, res) => {
+  let user = null;
+
+  if (req.session && req.session.user) {
+    user = req.session.user;
+  } else if (req.cookies && req.cookies.user) {
+    try {
+      user = JSON.parse(req.cookies.user);
+    } catch (err) {
+      console.error('Invalid cookie:', err);
+    }
+  }
   try {
     const page = 1;
     const limit = 10;
