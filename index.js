@@ -391,7 +391,7 @@ app.post('/submit-poll', async (req, res) => {
     ];
 
     await sheets.spreadsheets.values.append({
-      spreadsheetId: process.env.SPREADSHEET_ID,
+      spreadsheetId: '1YI0s9MprWcInk3Gol0w9Is5KCcYFTDRnGVNDPwwjRMw',
       range: 'poll_data',
       valueInputOption: 'USER_ENTERED',
       insertDataOption: 'INSERT_ROWS',
