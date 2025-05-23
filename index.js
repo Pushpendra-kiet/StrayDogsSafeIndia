@@ -168,28 +168,51 @@ app.get('/contact-us', (req, res) => {
   res.render('contact-us',{ user });
 });
 
+// GET /complaints?page=1&limit=10
 app.get('/complaints', async (req, res) => {
-
-      let user = null;
-
-  if (req.session && req.session.user) {
-    user = req.session.user;
-  } else if (req.cookies && req.cookies.user) {
-    try {
-      user = JSON.parse(req.cookies.user);
-    } catch (err) {
-      console.error('Invalid cookie:', err);
-    }
-  }
-
   try {
-    const complaints = await Complaint.find().sort({ createdAt: -1 }).limit(10);
-    res.render('complaints', { complaints, user });
-  } catch (err) {
-    console.error(err);
-    res.status(500).send('❌ Error fetching complaints');
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+
+    const authClient = await auth.getClient();
+    const sheets = google.sheets({ version: 'v4', auth: authClient });
+
+    const response = await sheets.spreadsheets.values.get({
+      spreadsheetId: '17IAiZgj9jWjf7gmVKkCv2YgZMIN_uOFSrU-pOtVgapA',
+      range: 'voices', // Sheet name
+    });
+
+    const rows = response.data.values;
+    if (!rows || rows.length <= 1) {
+      return res.json({ complaints: [], hasMore: false });
+    }
+
+    const allComplaints = rows.slice(1).map(row => ({
+      createdAt: new Date(row[0]),
+      message: row[1] || 'No message',
+      doi: new Date(row[2]),
+      city: row[3] || 'Unknown',
+      state: row[4] || 'Unknown',
+      name: 'Anonymous'
+    }));
+
+    // Sort by date descending
+    const sorted = allComplaints.sort((a, b) => b.createdAt - a.createdAt);
+
+    const start = (page - 1) * limit;
+    const paginated = sorted.slice(start, start + limit);
+
+    res.json({
+      complaints: paginated,
+      hasMore: start + limit < sorted.length
+    });
+
+  } catch (error) {
+    console.error('Error loading complaints:', error);
+    res.status(500).json({ error: 'Failed to load complaints' });
   }
 });
+
 
 app.post('/submit-complaints', async (req, res) => {
 
