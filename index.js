@@ -214,7 +214,7 @@ app.get('/complaints', async (req, res) => {
     const start = (page - 1) * limit;
     const paginated = sorted.slice(start, start + limit);
 
-    res.json({
+    res.render('complaints.ejs',{
       complaints: paginated,
       user : user,
       hasMore: start + limit < sorted.length
