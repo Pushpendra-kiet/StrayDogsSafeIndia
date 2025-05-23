@@ -191,63 +191,41 @@ app.get('/complaints', async (req, res) => {
   }
 });
 
-// Form submission route
-app.post('/submit', async (req, res) => {
-
-  let user = null;
-
-  if (req.session && req.session.user) {
-    user = req.session.user;
-  } else if (req.cookies && req.cookies.user) {
-    try {
-      user = JSON.parse(req.cookies.user);
-    } catch (err) {
-      console.error('Invalid cookie:', err);
-    }
-  }
-
-  const { message, doi, city, state, 'g-recaptcha-response': token } = req.body;
-
-  if (typeof user !== 'undefined' && user) {
-  var myname = user.name;
-  var myemail = user.email;  
-  } else { 
-   return res.render('/test')
-  }
-
-  if (!token) {
-    return res.send('⚠️ reCAPTCHA token missing.');
-  }
-
+router.post('/submit', async (req, res) => {
   try {
-    const secretKey = '6LdCpz4rAAAAAD34Q_Dy2DbI7elrwnIcCfXWN6XU';
+    const { message, doi, city, state } = req.body;
 
-    const response = await axios.post(
-      `https://www.google.com/recaptcha/api/siteverify`,
-      null,
-      {
-        params: {
-          secret: secretKey,
-          response: token,
-        },
-      }
-    );
+    // Optional: Add reCAPTCHA verification here if needed
 
-    const data = response.data;
+    const authClient = await auth.getClient();
+    const sheets = google.sheets({ version: 'v4', auth: authClient });
 
-    if (!data.success || data.score < 0.5 || data.action !== 'submit') {
-      return res.send('⚠️ Captcha failed. Please try again or check for suspicious activity.');
-    }
+    const row = [
+      new Date().toLocaleString(), // Timestamp
+      message,
+      doi,
+      city,
+      state,
+    ];
 
-    // ✅ Save complaint with authenticated user's name
-    await Complaint.create({ name: myname, message, city, state, doi, email:myemail });
-    return res.redirect('/');
+    await sheets.spreadsheets.values.append({
+      spreadsheetId: '17IAiZgj9jWjf7gmVKkCv2YgZMIN_uOFSrU-pOtVgapA',
+      range: 'Sheet1', // Change to your desired sheet name
+      valueInputOption: 'USER_ENTERED',
+      insertDataOption: 'INSERT_ROWS',
+      requestBody: {
+        values: [row],
+      },
+    });
 
-  } catch (err) {
-    console.error('Captcha error:', err);
-    res.status(500).send('❌ Server error during captcha verification.');
+    // On success, render a confirmation or redirect
+    res.render('thank-you'); // Replace with your actual success page
+  } catch (error) {
+    console.error('Error submitting complaint:', error);
+    res.status(500).send('Something went wrong while submitting the complaint.');
   }
 });
+
 //contact-us form
 // Form submission route
 app.post('/contact-us', async (req, res) => {
