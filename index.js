@@ -183,11 +183,12 @@ async function fetchComplaints() {
     .slice(1) // Skip header
     .map(row => ({
       createdAt: new Date(row[0]),
-      message: row[1] || '',
-      doi: new Date(row[2]) || '',
-      city: row[3] || '',
-      state: row[4] || '',
-      name: 'Anonymous', // Or fetch actual name if available
+      email: row[1] || '',
+      name: row[2] || 'Anonymous',
+      message: row[3] || '',
+      doi: new Date(row[4]) || '',
+      city: row[5] || '',
+      state: row[6] || ''
     }))
     .sort((a, b) => b.createdAt - a.createdAt); // Latest first
 }
