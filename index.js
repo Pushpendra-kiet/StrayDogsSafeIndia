@@ -170,6 +170,18 @@ app.get('/contact-us', (req, res) => {
 
 // GET /complaints?page=1&limit=10
 app.get('/complaints', async (req, res) => {
+    let user = null;
+
+  if (req.session && req.session.user) {
+    user = req.session.user;
+  } else if (req.cookies && req.cookies.user) {
+    try {
+      user = JSON.parse(req.cookies.user);
+    } catch (err) {
+      console.error('Invalid cookie:', err);
+    }
+  }
+
   try {
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
@@ -204,6 +216,7 @@ app.get('/complaints', async (req, res) => {
 
     res.json({
       complaints: paginated,
+      user : user,
       hasMore: start + limit < sorted.length
     });
 
