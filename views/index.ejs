@@ -87,46 +87,23 @@
   </div>
 </div>
 
-<section class="container mt-5">
-  <h2 class="text-center mb-4">📊 Poll Dashboard</h2>
-  <div class="row g-4">
-    <div class="col-md-3">
-      <div class="card shadow text-center">
-        <div class="card-body">
-          <h5 class="card-title">Total Responses</h5>
-          <p class="display-6"><%= totalPolls || 0 %></p>
-        </div>
-      </div>
-    </div>
+<div>
+<p id="totalPolls">Loading...</p>
+<p id="avgRating">Loading...</p>
+<p id="q1Yes">Loading...</p>
+<p id="q1Yes">Loading...</p>
+</div>
 
-    <div class="col-md-3">
-      <div class="card shadow text-center">
-        <div class="card-body">
-          <h5 class="card-title">Average Rating</h5>
-          <p class="display-6"><%= avgRating || 0 %></p>
-        </div>
-      </div>
-    </div>
-
-    <div class="col-md-3">
-      <div class="card shadow text-center">
-        <div class="card-body">
-          <h5 class="card-title">Q1: “हाँ” Count</h5>
-          <p class="display-6"><%= q1Yes || 0 %></p>
-        </div>
-      </div>
-    </div>
-
-    <div class="col-md-3">
-      <div class="card shadow text-center">
-        <div class="card-body">
-          <h5 class="card-title">Q2: “हाँ” Count</h5>
-          <p class="display-6"><%= q2Yes || 0 %></p>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
+<script>
+  fetch('/api/dashboard')
+    .then(res => res.json())
+    .then(data => {
+      document.getElementById('totalPolls').textContent = data.totalPolls;
+      document.getElementById('avgRating').textContent = data.avgRating;
+      document.getElementById('q1Yes').textContent = data.q1Yes;
+      document.getElementById('q2Yes').textContent = data.q2Yes;
+    });
+</script>
 
 
     <div class="container my-5">
