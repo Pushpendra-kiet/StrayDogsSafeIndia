@@ -255,7 +255,7 @@ app.post('/submit-complaints', async (req, res) => {
 
   const { message, doi, city, state, 'g-recaptcha-response': token } = req.body;
     if (!token) {
-    return res.send('⚠️ reCAPTCHA token missing.');
+    return res.send('<h2>⚠️ reCAPTCHA token missing.</h2><a href="https://saftefy-from-stray-dogs.vercel.app/contact-us">Home</a>');
   }
   try {
     
@@ -330,7 +330,7 @@ app.post('/contact-us', async (req, res) => {
   }
 
   if (!token) {
-    return res.send('⚠️ reCAPTCHA token missing.');
+    return res.send('<h2>⚠️ reCAPTCHA token missing.</h2><a href="https://saftefy-from-stray-dogs.vercel.app/contact-us">Home</a>');
   }
 
   try {
@@ -350,7 +350,7 @@ app.post('/contact-us', async (req, res) => {
     const data = response.data;
 
     if (!data.success || data.score < 0.5 || data.action !== 'submit') {
-      return res.send('⚠️ Captcha failed. Please try again or check for suspicious activity.');
+      return res.send('<h2>⚠️ Captcha failed. Please try again or check for suspicious activity.</h2><a href="https://saftefy-from-stray-dogs.vercel.app/contact-us">Home</a>');
     }
 
     // Step 2: Append to Google Sheet
@@ -421,7 +421,7 @@ app.post('/submit-poll', async (req, res) => {
     const alreadyVoted = rows.some(row => row[2] === myemail);
 
     if (alreadyVoted) {
-      return res.send('<h2>आप पहले ही मतदान कर चुके हैं। केवल एक बार मतदान की अनुमति है।</h2>');
+      return res.send('<h2>आप पहले ही मतदान कर चुके हैं। केवल एक बार मतदान की अनुमति है।</h2><a href="https://saftefy-from-stray-dogs.vercel.app/contact-us">Home</a>');
     }
 
     // Step 3: Append new row
@@ -444,7 +444,7 @@ app.post('/submit-poll', async (req, res) => {
       },
     });
 
-    res.send('<h2>धन्यवाद! आपका मतदान सफलतापूर्वक सबमिट हो गया है।</h2>');
+    res.send('<h2>धन्यवाद! आपका मतदान सफलतापूर्वक सबमिट हो गया है।</h2><a href="https://saftefy-from-stray-dogs.vercel.app/contact-us">Home</a>');
 
   } catch (error) {
     console.error('Error submitting poll:', error);
