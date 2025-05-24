@@ -89,7 +89,7 @@
 <!-- dash board-->
 <section>
 <div class="container mt-5">
-  <div class="row g-4" style='background-color:white;margin:5px;'>
+  <div class="row g-4" style='background-color:white;'>
     <div class="col-md-3">
       <div class="card text-white bg-primary shadow text-center">
         <div class="card-body">
@@ -101,27 +101,30 @@
     <div class="col-md-3">
       <div class="card text-white bg-success shadow text-center">
         <div class="card-body">
-          <h5 class="card-title">औसत गंभीरता कीी Rating</h5>
+          <h5 class="card-title">औसत गंभीरता की Rating</h5>
           <p class="display-6" id="avgRating">--</p>
         </div>
       </div>
     </div>
-    <div class="col-md-3">
-      <div class="card text-white bg-info shadow text-center">
-        <div class="card-body">
-          <h5 class="card-title">Q1 - "हाँ"</h5>
-          <p class="display-6" id="q1Yes">--</p>
-        </div>
-      </div>
+
+<div class="col-md-3">
+  <div class="card text-white bg-info shadow text-center">
+    <div class="card-body">
+      <h5 class="card-title">Q1 Acceptance</h5>
+      <canvas id="q1Chart" width="100" height="100"></canvas>
     </div>
-    <div class="col-md-3">
-      <div class="card text-white bg-warning shadow text-center">
-        <div class="card-body">
-          <h5 class="card-title">Q2 - "हाँ"</h5>
-          <p class="display-6" id="q2Yes">--</p>
-        </div>
-      </div>
+  </div>
+</div>
+
+<div class="col-md-3">
+  <div class="card text-white bg-warning shadow text-center">
+    <div class="card-body">
+      <h5 class="card-title">Q2 Acceptance</h5>
+      <canvas id="q2Chart" width="100" height="100"></canvas>
     </div>
+  </div>
+</div>
+
   </div>
 </div>
 
@@ -132,9 +135,53 @@
     .then(res => res.json())
     .then(data => {
       document.getElementById('totalPolls').textContent = data.totalPolls;
-      document.getElementById('avgRating').textContent = data.avgRating;
-      document.getElementById('q1Yes').textContent = data.q1Yes;
-      document.getElementById('q2Yes').textContent = data.q2Yes;
+      document.getElementById('avgRating').textContent = data.avgRating+'/10';
+
+      const q1Yes = data.q1Yes;
+      const q2Yes = data.q2Yes;
+      const total = data.totalPolls;
+
+      // Pie chart for Q1
+      new Chart(document.getElementById('q1Chart'), {
+        type: 'doughnut',
+        data: {
+          labels: ['हाँ', 'Other'],
+          datasets: [{
+            data: [q1Yes, total - q1Yes],
+            backgroundColor: ['#0dcaf0', '#dee2e6'],
+            borderWidth: 1
+          }]
+        },
+        options: {
+          plugins: {
+            legend: {
+              display: false
+            }
+          },
+          cutout: '70%',
+        }
+      });
+
+      // Pie chart for Q2
+      new Chart(document.getElementById('q2Chart'), {
+        type: 'doughnut',
+        data: {
+          labels: ['हाँ', 'Other'],
+          datasets: [{
+            data: [q2Yes, total - q2Yes],
+            backgroundColor: ['#ffc107', '#dee2e6'],
+            borderWidth: 1
+          }]
+        },
+        options: {
+          plugins: {
+            legend: {
+              display: false
+            }
+          },
+          cutout: '70%',
+        }
+      });
     })
     .catch(err => {
       console.error('Failed to load dashboard data', err);
