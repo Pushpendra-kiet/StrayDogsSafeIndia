@@ -453,14 +453,25 @@ app.post('/submit-poll', async (req, res) => {
 });
 
 //dashboard
-app.get('/dashboard', async (req, res) => {
+const { google } = require('googleapis');
+const path = require('path');
+
+const auth = new google.auth.GoogleAuth({
+  keyFile: path.join(__dirname, 'path/to/google-credentials.json'),
+  scopes: ['https://www.googleapis.com/auth/spreadsheets.readonly'],
+});
+
+const POLL_SHEET_ID = '1YI0s9MprWcInk3Gol0w9Is5KCcYFTDRnGVNDPwwjRMw';
+
+app.get('/', async (req, res) => {
+  let user = req.session?.user || null;
   try {
     const authClient = await auth.getClient();
     const sheets = google.sheets({ version: 'v4', auth: authClient });
 
     const result = await sheets.spreadsheets.values.get({
-      spreadsheetId: '1YI0s9MprWcInk3Gol0w9Is5KCcYFTDRnGVNDPwwjRMw',
-      range: 'Sheet1!A2:F', // Skip headers, get all rows
+      spreadsheetId: POLL_SHEET_ID,
+      range: 'Sheet1!A2:F',
     });
 
     const rows = result.data.values || [];
@@ -482,18 +493,26 @@ app.get('/dashboard', async (req, res) => {
 
     const avgRating = total > 0 ? (totalRating / total).toFixed(2) : 0;
 
-    res.render('dashboard', {
-      total,
+    res.render('index', {
+      user,
+      totalPolls: total,
       avgRating,
       q1Yes,
-      q2Yes,
+      q2Yes
     });
 
   } catch (err) {
     console.error('Dashboard Error:', err);
-    res.status(500).send('❌ Error loading dashboard');
+    res.render('index', {
+      user,
+      totalPolls: 0,
+      avgRating: 0,
+      q1Yes: 0,
+      q2Yes: 0
+    });
   }
 });
+
 
 // Start server
 const PORT = process.env.PORT || 3000;
