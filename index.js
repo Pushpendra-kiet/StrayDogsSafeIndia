@@ -452,6 +452,48 @@ app.post('/submit-poll', async (req, res) => {
   }
 });
 
+//dashboard
+app.get('/dashboard', async (req, res) => {
+  try {
+    const authClient = await auth.getClient();
+    const sheets = google.sheets({ version: 'v4', auth: authClient });
+
+    const result = await sheets.spreadsheets.values.get({
+      spreadsheetId: '1YI0s9MprWcInk3Gol0w9Is5KCcYFTDRnGVNDPwwjRMw',
+      range: 'Sheet1!A2:F', // Skip headers, get all rows
+    });
+
+    const rows = result.data.values || [];
+
+    let total = rows.length;
+    let totalRating = 0;
+    let q1Yes = 0;
+    let q2Yes = 0;
+
+    rows.forEach(row => {
+      const rating = parseFloat(row[3]) || 0;
+      const q1 = row[4]?.trim();
+      const q2 = row[5]?.trim();
+
+      totalRating += rating;
+      if (q1 === 'हाँ') q1Yes++;
+      if (q2 === 'हाँ') q2Yes++;
+    });
+
+    const avgRating = total > 0 ? (totalRating / total).toFixed(2) : 0;
+
+    res.render('dashboard', {
+      total,
+      avgRating,
+      q1Yes,
+      q2Yes,
+    });
+
+  } catch (err) {
+    console.error('Dashboard Error:', err);
+    res.status(500).send('❌ Error loading dashboard');
+  }
+});
 
 // Start server
 const PORT = process.env.PORT || 3000;
