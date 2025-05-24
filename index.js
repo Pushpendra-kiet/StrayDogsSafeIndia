@@ -301,7 +301,7 @@ app.post('/submit-complaints', async (req, res) => {
     });
 
     // On success, render a confirmation or redirect
-    res.send('thank-you'); // Replace with your actual success page
+    res.send('<h2>आपकी शिकायत सफलतापूर्वक दर्ज कर ली गई है। इसकी रिपोर्ट करने के लिए धन्यवाद।</h2><a href="https://saftefy-from-stray-dogs.vercel.app/contact-us">Home</a>'); // Replace with your actual success page
   } catch (error) {
     console.error('Error submitting complaint:', error);
     res.status(500).send('Something went wrong while submitting the complaint.');
