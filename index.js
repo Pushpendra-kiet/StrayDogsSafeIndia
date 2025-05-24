@@ -3,11 +3,8 @@ const bodyParser = require('body-parser');
 const { OAuth2Client } = require('google-auth-library');
 const axios = require('axios');
 const path = require('path');
-const mongoose = require('mongoose');
-const Complaint = require('./models/Complaint');
 const session = require('express-session');
 const crypto = require('crypto');
-const Contact = require('./models/Contact');
 const cookieParser = require('cookie-parser');
 const { google } = require('googleapis');
 //some
@@ -49,14 +46,6 @@ const auth = new google.auth.GoogleAuth({
 // Your spreadsheet ID (from URL of Google Sheets)
 const SID= process.env.SPREADSHEET_ID;
 
-
-mongoose.connect('mongodb+srv://pushpendrakumar:Realme%4012345@straydogsdata.jp0ruon.mongodb.net/complaints', {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-  bufferTimeoutMS: 45000
-})
-.then(() => console.log('✅ Connected to MongoDB'))
-.catch(err => console.error('❌ Connection error:', err));
 
 app.get('/auth/google', (req, res) => {
   const url = client.generateAuthUrl({
