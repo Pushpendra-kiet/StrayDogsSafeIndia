@@ -27,43 +27,53 @@
      .testnew:hover {
   color: magenta;background-color: aquamarine;
 }
-.profile-picture {
-      width: 60px;
-      height: 60px;
-      border-radius: 50%;
-      object-fit: cover;
-    }
     </style>
-<ul class="nav justify-content-end" style="background-color: bisque">
-  <li class="nav-item">
-    <a class="nav-link active test" aria-current="page" href="https://saftefy-from-stray-dogs.vercel.app/">Home</a>
-  </li>
-  <li class="nav-item">
-    <a class="nav-link test" href="https://saftefy-from-stray-dogs.vercel.app/raise-your-voice">Raise Your Voice</a>
-  </li>
-    <li class="nav-item">
-    <a class="nav-link test" href="https://saftefy-from-stray-dogs.vercel.app/complaints">Complaints</a>
-  </li>
-  <li class="nav-item">
-    <a class="nav-link test" href="https://saftefy-from-stray-dogs.vercel.app/contact-us">Contact Us</a>
-  </li>
-  <li class="nav-item">
-<% if (typeof user !== 'undefined' && user) { %>
-  <div class="card shadow-sm border-0 p-3 d-inline-flex align-items-center" style="max-width: 300px; border-radius: 1rem; background-color: bisque;">
-    <img src="<%= user.picture %>" alt="Profile Picture" class="rounded-circle me-3" width="50" height="50" style="object-fit: cover;">
-    <div>
-      <h6 class="mb-0">👋 Welcome, <%= user.name %></h6>
-      <small class="text-muted d-block"><%= user.email %></small>
-      <a href="/auth/logout" class="btn btn-sm btn-outline-danger mt-2">Logout</a>
+<nav class="navbar navbar-expand-lg navbar-dark" style="background-color: #f2c394;">
+  <div class="container-fluid">
+    <a class="navbar-brand fw-bold text-dark" href="https://saftefy-from-stray-dogs.vercel.app/">🐾 StrayDogsSafe</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent" 
+      aria-controls="navbarContent" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon text-dark"></span>
+    </button>
+
+    <div class="collapse navbar-collapse justify-content-end" id="navbarContent">
+      <ul class="navbar-nav me-3 mb-2 mb-lg-0">
+        <li class="nav-item">
+          <a class="nav-link fw-bold text-dark" href="https://saftefy-from-stray-dogs.vercel.app/">Home</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link fw-bold text-dark" href="https://saftefy-from-stray-dogs.vercel.app/raise-your-voice">Raise Your Voice</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link fw-bold text-dark" href="https://saftefy-from-stray-dogs.vercel.app/complaints">Complaints</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link fw-bold text-dark" href="https://saftefy-from-stray-dogs.vercel.app/contact-us">Contact Us</a>
+        </li>
+      </ul>
+
+      <!-- Login/User Section -->
+      <div class="d-flex align-items-center">
+        <% if (typeof user !== 'undefined' && user) { %>
+          <div class="d-flex align-items-center bg-light rounded p-2 shadow-sm" style="max-width: 300px;">
+            <img src="<%= user.picture %>" alt="Profile Picture" class="rounded-circle me-2" width="45" height="45" style="object-fit: cover;">
+            <div class="me-2">
+              <div class="fw-bold text-dark">👋 <%= user.name %></div>
+              <small class="text-muted"><%= user.email %></small>
+            </div>
+            <a href="/auth/logout" class="btn btn-sm btn-outline-danger ms-2">Logout</a>
+          </div>
+        <% } else { %>
+          <a href="/auth/google" class="btn btn-outline-dark fw-bold">
+            <i class="bi bi-google me-1"></i> Login with Google
+          </a>
+        <% } %>
+      </div>
     </div>
   </div>
-<% } else { %>
-  <a href="/auth/google" class="btn btn-outline-primary">
-    <i class="bi bi-google me-1"></i> Login with Google
-  </a>
-<% } %>
-  </li>
-</ul>
+</nav>
+
+
 <!-- Header -->
  <style>
     body{
