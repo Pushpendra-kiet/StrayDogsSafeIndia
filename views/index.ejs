@@ -135,17 +135,20 @@
     .then(res => res.json())
     .then(data => {
       document.getElementById('totalPolls').textContent = data.totalPolls;
-      document.getElementById('avgRating').textContent = data.avgRating+'/10';
+      document.getElementById('avgRating').textContent = data.avgRating;
 
       const q1Yes = data.q1Yes;
       const q2Yes = data.q2Yes;
       const total = data.totalPolls;
 
-      // Pie chart for Q1
+      const q1Percent = ((q1Yes / total) * 100).toFixed(1);
+      const q2Percent = ((q2Yes / total) * 100).toFixed(1);
+
+      // Q1 Chart
       new Chart(document.getElementById('q1Chart'), {
         type: 'doughnut',
         data: {
-          labels: ['हाँ', 'Other'],
+          labels: [`हाँ (${q1Percent}%)`, `Other (${(100 - q1Percent).toFixed(1)}%)`],
           datasets: [{
             data: [q1Yes, total - q1Yes],
             backgroundColor: ['#0dcaf0', '#dee2e6'],
@@ -155,18 +158,19 @@
         options: {
           plugins: {
             legend: {
-              display: false
+              display: true,
+              position: 'bottom'
             }
           },
-          cutout: '70%',
+          cutout: '60%'
         }
       });
 
-      // Pie chart for Q2
+      // Q2 Chart
       new Chart(document.getElementById('q2Chart'), {
         type: 'doughnut',
         data: {
-          labels: ['हाँ', 'Other'],
+          labels: [`हाँ (${q2Percent}%)`, `Other (${(100 - q2Percent).toFixed(1)}%)`],
           datasets: [{
             data: [q2Yes, total - q2Yes],
             backgroundColor: ['#ffc107', '#dee2e6'],
@@ -176,15 +180,13 @@
         options: {
           plugins: {
             legend: {
-              display: false
+              display: true,
+              position: 'bottom'
             }
           },
-          cutout: '70%',
+          cutout: '60%'
         }
       });
-    })
-    .catch(err => {
-      console.error('Failed to load dashboard data', err);
     });
 </script>
 
