@@ -86,13 +86,46 @@
 
   </div>
 </div>
-
-<div>
-<p id="totalPolls">Loading...</p>
-<p id="avgRating">Loading...</p>
-<p id="q1Yes">Loading...</p>
-<p id="q1Yes">Loading...</p>
+<!-- dash board-->
+<section>
+<div class="container mt-5">
+  <div class="row g-4">
+    <div class="col-md-3">
+      <div class="card text-white bg-primary shadow text-center">
+        <div class="card-body">
+          <h5 class="card-title">Total Responses</h5>
+          <p class="display-6" id="totalPolls">--</p>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card text-white bg-success shadow text-center">
+        <div class="card-body">
+          <h5 class="card-title">Average Rating</h5>
+          <p class="display-6" id="avgRating">--</p>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card text-white bg-info shadow text-center">
+        <div class="card-body">
+          <h5 class="card-title">Q1 - "हाँ"</h5>
+          <p class="display-6" id="q1Yes">--</p>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card text-white bg-warning shadow text-center">
+        <div class="card-body">
+          <h5 class="card-title">Q2 - "हाँ"</h5>
+          <p class="display-6" id="q2Yes">--</p>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
+
+<section>
 
 <script>
   fetch('/api/dashboard')
@@ -102,8 +135,12 @@
       document.getElementById('avgRating').textContent = data.avgRating;
       document.getElementById('q1Yes').textContent = data.q1Yes;
       document.getElementById('q2Yes').textContent = data.q2Yes;
+    })
+    .catch(err => {
+      console.error('Failed to load dashboard data', err);
     });
 </script>
+
 
 
     <div class="container my-5">
