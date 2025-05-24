@@ -453,11 +453,7 @@ app.post('/submit-poll', async (req, res) => {
 });
 
 //dashboard
-const POLL_SHEET_ID = '1YI0s9MprWcInk3Gol0w9Is5KCcYFTDRnGVNDPwwjRMw';
-
-app.get('/', async (req, res) => {
-  let user = req.session?.user || null;
-
+app.get('/api/dashboard', async (req, res) => {
   let totalPolls = 0;
   let avgRating = 0;
   let q1Yes = 0;
@@ -468,15 +464,14 @@ app.get('/', async (req, res) => {
     const sheets = google.sheets({ version: 'v4', auth: authClient });
 
     const result = await sheets.spreadsheets.values.get({
-      spreadsheetId: POLL_SHEET_ID,
-      range: 'Sheet1!A2:F',
+      spreadsheetId: '1YI0s9MprWcInk3Gol0w9Is5KCcYFTDRnGVNDPwwjRMw',
+      range: 'poll_data',
     });
 
     const rows = result.data.values || [];
-
     totalPolls = rows.length;
-    let totalRating = 0;
 
+    let totalRating = 0;
     rows.forEach(row => {
       const rating = parseFloat(row[3]) || 0;
       const q1 = row[4]?.trim();
@@ -490,13 +485,10 @@ app.get('/', async (req, res) => {
     avgRating = totalPolls > 0 ? (totalRating / totalPolls).toFixed(2) : 0;
 
   } catch (err) {
-    console.error('Dashboard data load failed:', err.message);
-    // Defaults already set above (0s)
+    console.error('Dashboard API error:', err.message);
   }
 
-  // ✅ Now always rendering the EJS with required variables
-  res.render('index', {
-    user,
+  res.json({
     totalPolls,
     avgRating,
     q1Yes,
