@@ -453,18 +453,16 @@ app.post('/submit-poll', async (req, res) => {
 });
 
 //dashboard
-const { google } = require('googleapis');
-const path = require('path');
-
-const auth = new google.auth.GoogleAuth({
-  keyFile: path.join(__dirname, 'path/to/google-credentials.json'),
-  scopes: ['https://www.googleapis.com/auth/spreadsheets.readonly'],
-});
-
 const POLL_SHEET_ID = '1YI0s9MprWcInk3Gol0w9Is5KCcYFTDRnGVNDPwwjRMw';
 
 app.get('/', async (req, res) => {
   let user = req.session?.user || null;
+
+  let totalPolls = 0;
+  let avgRating = 0;
+  let q1Yes = 0;
+  let q2Yes = 0;
+
   try {
     const authClient = await auth.getClient();
     const sheets = google.sheets({ version: 'v4', auth: authClient });
@@ -476,10 +474,8 @@ app.get('/', async (req, res) => {
 
     const rows = result.data.values || [];
 
-    let total = rows.length;
+    totalPolls = rows.length;
     let totalRating = 0;
-    let q1Yes = 0;
-    let q2Yes = 0;
 
     rows.forEach(row => {
       const rating = parseFloat(row[3]) || 0;
@@ -491,28 +487,22 @@ app.get('/', async (req, res) => {
       if (q2 === 'हाँ') q2Yes++;
     });
 
-    const avgRating = total > 0 ? (totalRating / total).toFixed(2) : 0;
-
-    res.render('index', {
-      user,
-      totalPolls: total,
-      avgRating,
-      q1Yes,
-      q2Yes
-    });
+    avgRating = totalPolls > 0 ? (totalRating / totalPolls).toFixed(2) : 0;
 
   } catch (err) {
-    console.error('Dashboard Error:', err);
-    res.render('index', {
-      user,
-      totalPolls: 0,
-      avgRating: 0,
-      q1Yes: 0,
-      q2Yes: 0
-    });
+    console.error('Dashboard data load failed:', err.message);
+    // Defaults already set above (0s)
   }
-});
 
+  // ✅ Now always rendering the EJS with required variables
+  res.render('index', {
+    user,
+    totalPolls,
+    avgRating,
+    q1Yes,
+    q2Yes
+  });
+});
 
 // Start server
 const PORT = process.env.PORT || 3000;
