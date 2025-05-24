@@ -321,14 +321,12 @@ app.post('/submit-complaints', async (req, res) => {
 
 
 //contact-us form
-// Form submission route
 app.post('/contact-us', async (req, res) => {
+  let user = null;
 
-    let user = null;
-
-  if (req.session && req.session.user) {
+  if (req.session?.user) {
     user = req.session.user;
-  } else if (req.cookies && req.cookies.user) {
+  } else if (req.cookies?.user) {
     try {
       user = JSON.parse(req.cookies.user);
     } catch (err) {
@@ -338,11 +336,8 @@ app.post('/contact-us', async (req, res) => {
 
   const { city, state, age, joinus, 'g-recaptcha-response': token } = req.body;
 
-   if (typeof user !== 'undefined' && user) {
-  var myname = user.name;
-  var myemail = user.email;  
-  } else { 
-   return res.render('/test')
+  if (!user) {
+    return res.render('test'); // or redirect if needed
   }
 
   if (!token) {
@@ -350,10 +345,10 @@ app.post('/contact-us', async (req, res) => {
   }
 
   try {
+    // Step 1: Verify reCAPTCHA
     const secretKey = '6LdCpz4rAAAAAD34Q_Dy2DbI7elrwnIcCfXWN6XU';
-
     const response = await axios.post(
-      `https://www.google.com/recaptcha/api/siteverify`,
+      'https://www.google.com/recaptcha/api/siteverify',
       null,
       {
         params: {
@@ -369,23 +364,33 @@ app.post('/contact-us', async (req, res) => {
       return res.send('⚠️ Captcha failed. Please try again or check for suspicious activity.');
     }
 
-    const ageNum = parseInt(age, 10);
-    const joinusBool = joinus === 'on';
+    // Step 2: Append to Google Sheet
+    const authClient = await auth.getClient();
+    const sheets = google.sheets({ version: 'v4', auth: authClient });
 
-    await Contact.create({
-      name:myname,
+    const values = [
+      new Date().toLocaleString(), // Timestamp
+      user.name,
+      user.email,
       city,
       state,
-      age: ageNum,
-      email:myemail,
-      joinus: joinusBool,
+      parseInt(age),
+      joinus === 'on' ? 'Yes' : 'No',
+    ];
+
+    await sheets.spreadsheets.values.append({
+      spreadsheetId: '1iDtqmcPJb420V7CHodZC7gmMR12P5nxTQ_VUXp-Vk-4',
+      range: 'Sheet1', // Replace with your sheet name
+      valueInputOption: 'USER_ENTERED',
+      resource: {
+        values: [values],
+      },
     });
 
-    return res.render('joined',{user} );
-
+    return res.render('joined', { user });
   } catch (err) {
-    console.error('Captcha error:', err);
-    res.status(500).send('❌ Server error during captcha verification.');
+    console.error('Error during contact-us form submission:', err);
+    res.status(500).send('❌ Server error.');
   }
 });
 
